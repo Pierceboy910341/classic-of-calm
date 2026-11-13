@@ -195,8 +195,10 @@ def run(cmd, cwd=None, env=None, logfile=None, deadline=None, prefix=""):
     """執行指令並即時顯示輸出；超過 deadline 會被強制停止。回傳 exit code。"""
     logfile = logfile or f"{LOG_DIR}/install.log"
     full_env = {**os.environ, **(env or {})}
-    for k in ("VIRTUAL_ENV", "PYTHONHOME"):
+    for k in ("VIRTUAL_ENV", "PYTHONHOME", "PYTHONPATH"):
         full_env.pop(k, None)
+    # Kaggle 設定 MPLBACKEND=module://matplotlib_inline…，模型的獨立環境沒有這個套件會直接崩潰
+    full_env["MPLBACKEND"] = "Agg"
     proc = subprocess.Popen(cmd, cwd=cwd, env=full_env, stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT, text=True, bufsize=1, errors="replace")
     t = threading.Thread(target=_stream, args=(proc, logfile, prefix), daemon=True)

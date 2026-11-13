@@ -28,6 +28,9 @@ import dataclasses
 import gc
 import json
 import os
+
+# Kaggle sets MPLBACKEND to an inline backend that the model venv lacks; force a headless one.
+os.environ["MPLBACKEND"] = "Agg"
 import shutil
 import sys
 import tempfile
