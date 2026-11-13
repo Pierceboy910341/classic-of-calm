@@ -9,7 +9,7 @@ For the owner, the only commands that matter are the install line and `coc`.
 On a fresh Ubuntu 24.04 server, logged in as the default `ubuntu` user:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/OWNER/classic-of-calm/main/stream/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/Pierceboy910341/classic-of-calm/main/stream/install.sh | sudo bash
 ```
 
 - **Before first use, replace `OWNER`** in that line *and* in `COC_REPO=` at the
@@ -99,7 +99,9 @@ pick up new files.
 | Python supervisor hangs or dies | systemd `WatchdogSec=180` (it is pinged only while healthy) together with `Restart=always`, `StartLimitIntervalSec=0` |
 
 Signals for the main PID: TERM/INT stop, USR1/HUP do a graceful restart, USR2
-skips the current track (`sudo coc skip`).
+skips the current track (`sudo coc skip`). Skip acts on the track the feeder is
+currently decoding, which is about 6 s ahead of what viewers hear. If you skip
+in the last few seconds of a song, the skip lands on the next song instead.
 
 Turn **off "Auto-stop"** in YouTube Studio's stream settings. A reconnect then
 continues the same broadcast instead of ending it. Use the default

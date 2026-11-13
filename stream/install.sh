@@ -2,7 +2,7 @@
 # Classic of Calm — 24/7 stream host installer (Ubuntu 24.04, x86_64 or ARM64)
 #
 # Fresh server, one line (as the default ubuntu user):
-#   curl -fsSL https://raw.githubusercontent.com/OWNER/classic-of-calm/main/stream/install.sh | sudo bash
+#   curl -fsSL https://raw.githubusercontent.com/Pierceboy910341/classic-of-calm/main/stream/install.sh | sudo bash
 # From a checkout of the repo:
 #   sudo bash stream/install.sh
 # Change the stream key / Kaggle settings later:
@@ -15,7 +15,7 @@ set -euo pipefail
 
 # Where to download the code from when run via curl. Private repo: also export
 # GITHUB_TOKEN=... (a read-only token) before running.
-COC_REPO="${COC_REPO:-OWNER/classic-of-calm}"
+COC_REPO="${COC_REPO:-Pierceboy910341/classic-of-calm}"
 COC_REF="${COC_REF:-main}"
 
 APP_DIR=/opt/classic-of-calm
