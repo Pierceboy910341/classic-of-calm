@@ -1,0 +1,333 @@
+{
+  "week": "2026-W47",
+  "theme": "南山經・招搖山夜讀 (Zhaoyao Mountain night study)",
+  "note": "週變數卡 (music bible §5, §10.3). Lineage for tracks.csv; lore_note feeds the per-track line in the description.",
+  "tracks": [
+    {
+      "id": "s01",
+      "template": "S01",
+      "season": "deep autumn",
+      "weather": "mountain drizzle",
+      "time": "late night",
+      "scene": "glowing tree grove",
+      "lead_cn": "guzheng",
+      "texture_cn": null,
+      "caption_chars": 242,
+      "lore_note": "Migu: a tree on Zhaoyao Mountain whose blossoms shine in all directions; wear one and you will not lose your way."
+    },
+    {
+      "id": "s02",
+      "template": "S02",
+      "weather": "rolling fog",
+      "time": "2am",
+      "lead_cn": "xiao",
+      "texture_cn": null,
+      "caption_chars": 219,
+      "lore_note": "Late-night reading in a cliffside library, by blossom-light."
+    },
+    {
+      "id": "s03",
+      "template": "S03",
+      "season": "deep autumn",
+      "time": "dusk",
+      "scene": "misty jade mountain",
+      "lead_cn": "pipa",
+      "texture_cn": "muyu",
+      "caption_chars": 224,
+      "lore_note": "Three hundred li east of Zhaoyao lies Tangting Mountain, the next stop on the old road."
+    },
+    {
+      "id": "s04",
+      "template": "S04",
+      "weather": "light rain",
+      "time": "late night",
+      "scene": "ancient pine shrine",
+      "lead_cn": null,
+      "texture_cn": "guzheng",
+      "caption_chars": 229,
+      "lore_note": "The xingxing of Zhaoyao has white ears. Ours uses them to listen."
+    },
+    {
+      "id": "s05",
+      "template": "S05",
+      "season": "deep autumn",
+      "scene": "terraced tea hills",
+      "lead_cn": "yangqin",
+      "texture_cn": null,
+      "caption_chars": 216,
+      "lore_note": "The text says Zhaoyao Mountain is thick with osmanthus (gui) trees."
+    },
+    {
+      "id": "s06",
+      "template": "S06",
+      "weather": "soft snowfall",
+      "time": "blue hour",
+      "scene": "glowing tree grove",
+      "lead_cn": "guzheng",
+      "texture_cn": null,
+      "caption_chars": 231,
+      "lore_note": "'The xingxing knows people's names.' (Classic of the Regions Within the Seas: South)"
+    },
+    {
+      "id": "s07",
+      "template": "S07",
+      "season": "deep autumn",
+      "time": "late night",
+      "scene": "hidden valley spring",
+      "lead_cn": "pipa",
+      "texture_cn": null,
+      "caption_chars": 244,
+      "lore_note": "The first range of the Southern Mountains is called the Magpie Mountains; Zhaoyao is its head."
+    },
+    {
+      "id": "s08",
+      "template": "S08",
+      "time": "3am",
+      "scene": "quiet island temple",
+      "lead_cn": "xiao",
+      "texture_cn": "guzheng",
+      "caption_chars": 209,
+      "lore_note": "Sing carries its notes the old way: on bamboo slips."
+    },
+    {
+      "id": "s09",
+      "template": "S09",
+      "season": "early winter",
+      "weather": "after-storm calm",
+      "scene": "cliffside library",
+      "lead_cn": "guzheng",
+      "texture_cn": "muyu",
+      "caption_chars": 235,
+      "lore_note": "Zhaoyao Mountain 'looks down over the Western Sea'."
+    },
+    {
+      "id": "s10",
+      "template": "S10",
+      "season": "deep autumn",
+      "time": "blue hour",
+      "scene": "bamboo forest path",
+      "lead_cn": null,
+      "texture_cn": "yangqin",
+      "caption_chars": 236,
+      "lore_note": "Wear a Migu blossom and you will not lose your way: the channel's promise of focus."
+    },
+    {
+      "id": "s11",
+      "template": "S01z",
+      "season": "early winter",
+      "weather": "clear sky",
+      "time": "late night",
+      "scene": "glowing tree grove",
+      "lead_cn": "guzheng",
+      "texture_cn": null,
+      "caption_chars": 251,
+      "lore_note": "'Its blossoms shine in all four directions.'"
+    },
+    {
+      "id": "s12",
+      "template": "S02z",
+      "weather": "soft snowfall",
+      "time": "2am",
+      "lead_cn": "xiao",
+      "texture_cn": null,
+      "caption_chars": 246,
+      "lore_note": "Kunlun: 'the lower capital of the Lord on High' in the Classic of the Western Mountains."
+    },
+    {
+      "id": "s13",
+      "template": "S03",
+      "season": "early winter",
+      "time": "late night",
+      "scene": "ancient pine shrine",
+      "lead_cn": "pipa",
+      "texture_cn": "muyu",
+      "caption_chars": 231,
+      "lore_note": "Zhuyu: a leek-like herb of Zhaoyao; eat it and you will not go hungry."
+    },
+    {
+      "id": "s14",
+      "template": "S04",
+      "weather": "mountain drizzle",
+      "time": "dusk",
+      "scene": "hidden valley spring",
+      "lead_cn": null,
+      "texture_cn": "guzheng",
+      "caption_chars": 230,
+      "lore_note": "The text says Zhaoyao holds much gold and jade."
+    },
+    {
+      "id": "s15",
+      "template": "S05b",
+      "season": "early winter",
+      "scene": "bamboo forest path",
+      "lead_cn": null,
+      "texture_cn": null,
+      "caption_chars": 233,
+      "lore_note": "'It crawls on all fours, then walks upright like a person.' (Classic of the Southern Mountains)"
+    },
+    {
+      "id": "s16",
+      "template": "S06",
+      "weather": "frosty air",
+      "time": "late night",
+      "scene": "hidden valley spring",
+      "lead_cn": "guzheng",
+      "texture_cn": null,
+      "caption_chars": 231,
+      "lore_note": "Zhuyin, god of Mount Zhong: when it opens its eyes it is day, when it closes them it is night."
+    },
+    {
+      "id": "s17",
+      "template": "S07",
+      "season": "deep autumn",
+      "time": "2am",
+      "scene": "quiet island temple",
+      "lead_cn": "pipa",
+      "texture_cn": null,
+      "caption_chars": 236,
+      "lore_note": "A study track for long reading sessions."
+    },
+    {
+      "id": "s18",
+      "template": "S08",
+      "time": "3am",
+      "scene": "ancient pine shrine",
+      "lead_cn": "xiao",
+      "texture_cn": "guzheng",
+      "caption_chars": 209,
+      "lore_note": "The last chapters of the old book are the Classics of the Great Wilderness."
+    },
+    {
+      "id": "s19",
+      "template": "S09",
+      "season": "early winter",
+      "weather": "clear sky",
+      "scene": "misty jade mountain",
+      "lead_cn": "guzheng",
+      "texture_cn": "muyu",
+      "caption_chars": 230,
+      "lore_note": "Ink, rain and the Classic of the Western Mountains."
+    },
+    {
+      "id": "s20",
+      "template": "S10",
+      "season": "midwinter",
+      "time": "blue hour",
+      "scene": "glowing tree grove",
+      "lead_cn": null,
+      "texture_cn": "yangqin",
+      "caption_chars": 234,
+      "lore_note": "Migu blossom gold against an indigo winter night."
+    },
+    {
+      "id": "c01",
+      "template": "C01",
+      "season": "early winter",
+      "time": "late morning",
+      "scene": "terraced tea hills",
+      "lead_cn": "pipa",
+      "texture_cn": null,
+      "caption_chars": 226,
+      "lore_note": "Sing takes its notes outside for a sunny morning."
+    },
+    {
+      "id": "c02",
+      "template": "C02",
+      "weather": "warm breeze",
+      "scene": "hidden valley spring",
+      "lead_cn": "yangqin",
+      "texture_cn": null,
+      "caption_chars": 227,
+      "lore_note": "Next week's guest: the Lushu, whose voice 'sounds like a folk song'."
+    },
+    {
+      "id": "c03",
+      "template": "C03",
+      "season": "early winter",
+      "time": "early morning",
+      "scene": "quiet island temple",
+      "lead_cn": "dizi",
+      "texture_cn": "muyu",
+      "caption_chars": 243,
+      "lore_note": "Zhuyu: the herb of Zhaoyao that keeps hunger away."
+    },
+    {
+      "id": "c04",
+      "template": "C04",
+      "weather": "clear sky",
+      "time": "golden hour",
+      "scene": "terraced tea hills",
+      "lead_cn": null,
+      "texture_cn": "guzheng",
+      "caption_chars": 248,
+      "lore_note": "Huaijiang Mountain: the Lord on High's hanging garden, kept by Yingzhao."
+    },
+    {
+      "id": "c05",
+      "template": "C08",
+      "weather": "warm breeze",
+      "time": "late morning",
+      "scene": "river of floating lanterns",
+      "lead_cn": "erhu",
+      "texture_cn": null,
+      "caption_chars": 241,
+      "lore_note": "Fusang, the tree where the ten suns bathe, in the Classic of the Regions Beyond the Seas: East."
+    },
+    {
+      "id": "l01",
+      "template": "L01",
+      "season": "midwinter",
+      "weather": "soft snowfall",
+      "time": "3am",
+      "scene": "quiet island temple",
+      "lead_cn": "guzheng",
+      "texture_cn": null,
+      "caption_chars": 217,
+      "lore_note": "Changxi gave birth to twelve moons and bathed them (Classic of the Great Wilderness: West)."
+    },
+    {
+      "id": "l02",
+      "template": "L02",
+      "time": "late night",
+      "scene": "sea of clouds",
+      "lead_cn": "xiao",
+      "texture_cn": null,
+      "caption_chars": 194,
+      "lore_note": "Coming soon: the Xuangui turtle, whose voice 'sounds like splitting wood'."
+    },
+    {
+      "id": "l03",
+      "template": "L03",
+      "season": "midwinter",
+      "weather": "light rain",
+      "time": "2am",
+      "scene": "ancient pine shrine",
+      "lead_cn": null,
+      "texture_cn": "guzheng",
+      "caption_chars": 216,
+      "lore_note": "Jade Mountain, home of the Queen Mother of the West."
+    },
+    {
+      "id": "l04",
+      "template": "L06",
+      "season": "midwinter",
+      "time": "late night",
+      "scene": "moonlit lake",
+      "lead_cn": null,
+      "texture_cn": "guzheng",
+      "caption_chars": 207,
+      "lore_note": "'A woman is bathing the moons.' (Classic of the Great Wilderness: West)"
+    },
+    {
+      "id": "l05",
+      "template": "L10",
+      "season": "early winter",
+      "time": "3am",
+      "scene": "sea of clouds",
+      "lead_cn": null,
+      "texture_cn": "temple_bell",
+      "caption_chars": 238,
+      "lore_note": "A sleep track for the hours before dawn."
+    }
+  ]
+}
