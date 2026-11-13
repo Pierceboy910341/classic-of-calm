@@ -163,16 +163,17 @@ def plan_models(plan: Dict[str, Any]) -> List[str]:
     return out
 
 
-def validate_plan(plan: Dict[str, Any]) -> Tuple[List[str], List[str]]:
-    """Return (errors, warnings). Errors on a track mean that track is skipped."""
+def validate_plan(plan: Dict[str, Any]) -> Tuple[List[str], List[str], List[str]]:
+    """Return (errors, warnings, bad_track_ids). Tracks listed in bad_track_ids are skipped."""
     errors: List[str] = []
     warnings: List[str] = []
+    bad: List[str] = []
     if not isinstance(plan, dict):
-        return ["plan.json 最外層必須是物件 {…}"], warnings
+        return ["plan.json 最外層必須是物件 {…}"], warnings, bad
     tracks = plan.get("tracks")
     if not isinstance(tracks, list) or not tracks:
         errors.append("plan.json 裡沒有 tracks（歌曲清單）")
-        return errors, warnings
+        return errors, warnings, bad
     for m in plan.get("models") or []:
         if not normalize_model_name(m):
             warnings.append(f"不認得的模型名稱 {m!r}，會略過（認得：{', '.join(KNOWN_MODELS)}）")
@@ -183,6 +184,7 @@ def validate_plan(plan: Dict[str, Any]) -> Tuple[List[str], List[str]]:
         if not isinstance(t, dict):
             errors.append(f"第 {i + 1} 首不是物件")
             continue
+        n_err = len(errors)
         missing = [f for f in REQUIRED_TRACK_FIELDS if t.get(f) in (None, "")]
         if missing:
             errors.append(f"歌曲 {label} 缺少欄位：{', '.join(missing)}")
@@ -206,7 +208,13 @@ def validate_plan(plan: Dict[str, Any]) -> Tuple[List[str], List[str]]:
             errors.append(f"歌曲 {label} 的 duration 不是數字")
         if len(str(t.get("tags", ""))) > 512:
             warnings.append(f"歌曲 {label} 的 tags 超過 512 字元，ACE-Step 會截斷")
-    return errors, warnings
+        if len(errors) > n_err and tid:
+            bad.append(str(tid))
+        elif len(errors) > n_err:
+            bad.append(f"#{i + 1}")
+    if plan.get("week") in (None, ""):
+        warnings.append("plan.json 沒有 week 欄位")
+    return errors, warnings, bad
 
 
 # ---------------------------------------------------------------------------
@@ -502,7 +510,7 @@ def noise_suspect(path: str) -> Dict[str, Any]:
         if frames:
             spec = np.abs(np.fft.rfft(seg[: frames * n].reshape(frames, n) * np.hanning(n), axis=1)) + 1e-10
             flat = float(np.mean(np.exp(np.mean(np.log(spec), axis=1)) / np.mean(spec, axis=1)))
-        return {"rms_dbfs": round(20 * np.log10(rms), 1), "spectral_flatness": round(flat, 3),
-                "suspect": bool(rms < 1e-3 or flat > 0.45)}
+        return {"rms_dbfs": round(float(20 * np.log10(rms)), 1), "spectral_flatness": round(flat, 3),
+                "suspect": bool(rms < 1e-3 or flat > 0.5)}
     except Exception as e:  # never fail a generation because of the check
         return {"check_error": str(e)[:200]}

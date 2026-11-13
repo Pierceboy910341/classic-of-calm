@@ -1,0 +1,29 @@
+{
+  "week": "_example",
+  "trial": true,
+  "series": "study",
+  "creature": {"no": 1, "id": "shengsheng", "zh": "狌狌", "en": "Shengsheng",
+               "quote_zh": "有獸焉，其狀如禺而白耳，伏行人走，其名曰狌狌，食之善走。",
+               "quote_en": "There is a beast shaped like an ape with white ears; it crawls and walks upright. Its name is Shengsheng.",
+               "source": "南山經"},
+  "models": ["ace-step-1.5", "stable-audio-3"],
+  "tracks": [
+    {"id": "s01", "series": "study",
+     "title_en": "Shengsheng Reads by Rain", "title_zh": "狌狌聽雨讀書",
+     "tags": "jazzy lofi hip hop, chinese zither guzheng melody with gentle string bends, warm Rhodes jazz chords, upright bass, laid-back boom-bap drums, vinyl crackle, focused and calm, mountain drizzle over a cliffside library at late night, deep autumn, instrumental",
+     "negative": "vocals, singing, choir, rap, gong crash, koto, shakuhachi, harsh distortion",
+     "bpm": 80, "key": "D minor", "duration": 60, "seed": 1234,
+     "layer": {"instrument": "guzheng", "role": "ornament"}},
+    {"id": "s02", "series": "study",
+     "title_en": "Lantern Moss on the Jade Path", "title_zh": "玉徑苔燈",
+     "tags": "mellow lofi hip hop, soft pipa phrases, felt piano, warm tape-saturated bass, brushed drums, light rain texture, gentle and nostalgic, bamboo forest path at dusk, early spring, instrumental",
+     "negative": "vocals, singing, rap, speech, gong crash, fast pentatonic runs",
+     "bpm": 74, "key": "A dorian", "duration": 60, "seed": 5678,
+     "layer": {"instrument": "pipa", "role": "ornament"}}
+  ],
+  "art": {"scene_prompt": "Blue-green shanshui handscroll, a white-eared ape reading in a cliffside library during rain, vermilion seal, calm",
+          "thumbnail_prompt": "Blue-green shanshui, white-eared ape with a book, rain, large empty sky area for title"},
+  "youtube": {"title": "Study lofi · Shengsheng Reads by Rain (TEST)",
+              "description": "Example plan for testing notebook 01. Not for upload.",
+              "tags": ["lofi", "study music", "guzheng"]}
+}
