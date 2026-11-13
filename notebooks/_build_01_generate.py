@@ -30,7 +30,7 @@ MD_INTRO = r"""# 🎵 Classic of Calm — 01 生成候選曲（每週一）
 
 CONFIG = r'''# ====== ✏️ 設定（每週只要改 WEEK）======
 WEEK = "2026-W47"                      # 本週代號，對應 GitHub 上的 weekly/<WEEK>/plan.json（測試可用 "_example"）
-REPO = "YOUR-GITHUB-NAME/classic-of-calm"  # GitHub repo（第一次設定好就不用再改）
+REPO = "Pierceboy910341/classic-of-calm"  # GitHub repo（第一次設定好就不用再改）
 BRANCH = "main"                        # 分支，通常不用改
 
 # ---- 以下是進階設定，平常不用動 ----

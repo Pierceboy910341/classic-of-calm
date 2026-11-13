@@ -21,3 +21,6 @@ weekly/*/art/*_v[0-9]*.png
 __pycache__/
 *.pyc
 .venv/
+
+# CC0 instrument samples are small and needed by notebook 02
+!samples/**/*.wav

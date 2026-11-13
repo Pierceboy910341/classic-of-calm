@@ -1,0 +1,27 @@
+[Unit]
+Description=Classic of Calm - download new stream tracks from Kaggle
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=stream
+Group=stream
+EnvironmentFile=-/etc/classic-of-calm/env
+Environment=PYTHONPATH=/opt/classic-of-calm PYTHONUNBUFFERED=1 HOME=/var/lib/classic-of-calm
+ExecStart=/usr/bin/python3 -m coc.sync
+TimeoutStartSec=4h
+# stay out of the streamer's way
+Nice=15
+IOSchedulingClass=idle
+CPUWeight=20
+StateDirectory=classic-of-calm
+StateDirectoryMode=0755
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes

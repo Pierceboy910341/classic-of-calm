@@ -1,0 +1,9 @@
+/var/lib/classic-of-calm/state/played.log {
+    weekly
+    rotate 12
+    compress
+    missingok
+    notifempty
+    copytruncate
+    su stream stream
+}

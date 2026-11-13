@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# coc — Classic of Calm stream host control.  Run `coc help`.
+set -euo pipefail
+
+APP_DIR="${COC_APP_DIR:-/opt/classic-of-calm}"
+ENV_FILE=/etc/classic-of-calm/env
+DATA_DIR="${COC_HOME:-/var/lib/classic-of-calm}"
+export PYTHONPATH="$APP_DIR${PYTHONPATH:+:$PYTHONPATH}"
+PY=/usr/bin/python3
+[ -x "$PY" ] || PY=python3
+
+need_root() {
+  if [ "$(id -u)" -ne 0 ]; then
+    echo "Please run with sudo:  sudo coc $*"
+    echo "請在前面加上 sudo：     sudo coc $*"
+    exit 1
+  fi
+}
+
+main_pid() { systemctl show -p MainPID --value coc-streamer.service 2>/dev/null || echo 0; }
+
+cmd="${1:-status}"
+shift || true
+
+case "$cmd" in
+  status|st)
+    exec "$PY" -m coc.status "$@"
+    ;;
+  now)
+    cat "$DATA_DIR/now_playing.txt" 2>/dev/null || echo "(nothing playing yet)"
+    ;;
+  logs|log)
+    need_root logs
+    if [ "${1:-}" = "-f" ]; then
+      exec journalctl -u coc-streamer -u coc-sync -f -n 50
+    fi
+    exec journalctl -u coc-streamer -u coc-sync -n "${1:-80}" --no-pager
+    ;;
+  sync)
+    need_root sync
+    echo "Downloading the newest music from Kaggle... (can take a few minutes)"
+    echo "正在從 Kaggle 下載最新歌曲……（可能需要幾分鐘）"
+    if systemctl start coc-sync.service; then echo "Done 完成"; else echo "Sync failed 同步失敗 — see: sudo coc logs"; fi
+    "$PY" -m coc.status
+    ;;
+  import)
+    need_root import
+    [ -d "${1:-}" ] || { echo "usage: sudo coc import /path/to/folder  (with stream_tracks/ and stream_loop.mp4)"; exit 2; }
+    # Copy into a folder the stream user can read, then import as that user
+    # (same settings as the daily sync service).
+    mkdir -p "$DATA_DIR/staging"
+    tmp="$(mktemp -d "$DATA_DIR/staging/import.XXXXXX")"
+    trap 'rm -rf "$tmp"' EXIT
+    cp -r "$1"/. "$tmp"/
+    chown -R stream:stream "$tmp"
+    systemd-run --quiet --wait --pipe --collect -p User=stream -p Group=stream \
+      -p EnvironmentFile=-"$ENV_FILE" -E PYTHONPATH="$APP_DIR" \
+      "$PY" -m coc.sync --from-dir "$tmp" "${@:2}"
+    ;;
+  restart)
+    need_root restart
+    if [ "${1:-}" = "--now" ]; then
+      systemctl restart coc-streamer.service
+      echo "Restarted now 已立即重新啟動"
+    else
+      systemctl reload coc-streamer.service
+      echo "The stream will reconnect at the end of the current song (no cut mid-song)."
+      echo "直播會在這首歌結束時重新連線（不會切在歌曲中間）。"
+    fi
+    ;;
+  skip)
+    need_root skip
+    pid="$(main_pid)"
+    [ "$pid" != 0 ] && kill -USR2 "$pid" && echo "Skipping to the next song 跳到下一首"
+    ;;
+  start|stop)
+    need_root "$cmd"
+    systemctl "$cmd" coc-streamer.service
+    echo "coc-streamer: $(systemctl is-active coc-streamer.service)"
+    ;;
+  setup|config)
+    need_root setup
+    exec bash "$APP_DIR/install.sh" --configure
+    ;;
+  check-loop)
+    exec "$PY" -m coc.status check-loop "$@"
+    ;;
+  help|-h|--help)
+    cat <<'EOF'
+coc — Classic of Calm stream host 直播主機指令
+
+  coc                     show status 顯示狀態
+  coc now                 current song title 目前歌曲
+  sudo coc logs [-f]      recent logs 最近紀錄 (-f = follow 持續顯示)
+  sudo coc sync           get new music from Kaggle now 立即同步新歌
+  sudo coc import DIR     import a folder (stream_tracks/ + stream_loop.mp4) 匯入資料夾
+  sudo coc restart        reconnect at the end of this song 歌曲結束時重新連線
+  sudo coc restart --now  restart immediately 立即重新啟動
+  sudo coc skip           next song 下一首
+  sudo coc stop | start   stop / start the stream 停止／開始直播
+  sudo coc setup          change stream key / Kaggle settings 修改金鑰與設定
+  coc check-loop FILE     check a loop video can be streamed 檢查循環影片
+EOF
+    ;;
+  *)
+    echo "Unknown command: $cmd  (try: coc help)"; exit 2 ;;
+esac

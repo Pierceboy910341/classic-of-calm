@@ -48,6 +48,9 @@ EQ = {  # gentle, "warm & a bit dark" (bible 2/3/4 mix notes); 2-5 kHz pluck sof
     "work": [("peak", 3500, -1.0, 0.8), ("highshelf", 12000, -0.5, 0.7)],
     "sleep": [("peak", 3000, -2.0, 0.7), ("highshelf", 8000, -3.0, 0.7), ("lowshelf", 120, 0.5, 0.7)],
 }
+# lossy AAC (stream_tracks, compilation.mp4) overshoots the PCM true peak by ~0.3-0.8 dB (worst on clicks/crackle),
+# so masters are limited this much below the spec ceiling.
+AAC_HEADROOM_DB = 0.8
 COMP = {"study": (1.6, -6.0), "work": (1.6, -6.0), "sleep": (1.3, -8.0)}  # ratio, thr rel. to RMS
 
 
@@ -178,13 +181,13 @@ def master_track(x: np.ndarray, sr: int, series: str = "study", fade_out=None,
         if cur <= -69:
             break
         x = x * from_db(target - cur)
-        x, lim = tp_limit(x, sr, ceiling - 0.15)
+        x, lim = tp_limit(x, sr, ceiling - AAC_HEADROOM_DB - 0.1)
         lim_total = max(lim_total, lim)
         if abs(integrated_lufs(x, sr) - target) < 0.2:
             break
     tp = true_peak_db(x, sr)
-    if tp > ceiling - 0.05:
-        x = x * from_db(ceiling - 0.1 - tp)
+    if tp > ceiling - AAC_HEADROOM_DB:
+        x = x * from_db(ceiling - AAC_HEADROOM_DB - 0.05 - tp)
     info.update(lufs=round(integrated_lufs(x, sr), 2), true_peak=round(true_peak_db(x, sr), 2),
                 limiter_max_gr_db=round(lim_total, 2), target_lufs=target, ceiling_dbtp=ceiling,
                 duration_s=round(len(x) / sr, 2), sample_rate=sr)

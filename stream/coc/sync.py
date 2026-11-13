@@ -14,8 +14,10 @@ on its own at the next track boundary.
 from __future__ import annotations
 
 import argparse
+import csv
 import fcntl
 import hashlib
+import io
 import os
 import re
 import shutil
@@ -43,7 +45,8 @@ def normalize_slug(s: str) -> str:
 
 
 def kaggle_env(cfg: Config) -> dict:
-    env = dict(os.environ)
+    # Empty KAGGLE_* variables confuse the CLI's auth detection.
+    env = {k: v for k, v in os.environ.items() if not (k.startswith("KAGGLE_") and not v.strip())}
     kdir = cfg.home / ".kaggle"
     kdir.mkdir(parents=True, exist_ok=True)
     env.setdefault("HOME", str(cfg.home))
@@ -74,6 +77,24 @@ def download(cfg: Config, dest: Path) -> tuple[bool, str]:
         if "unrecognized arguments" not in out:
             break  # real error, don't retry without the filter
     return False, f"kaggle CLI failed: {last}"
+
+
+def remote_last_run(cfg: Config) -> str | None:
+    """lastRunTime of the notebook according to Kaggle, or None if unknown.
+    Lets the daily sync skip a ~200 MB download when nothing new ran."""
+    slug = normalize_slug(cfg.kaggle_notebook)
+    try:
+        p = subprocess.run([cfg.kaggle_bin, "kernels", "list", "--mine", "--csv",
+                            "--sort-by", "dateRun", "--page-size", "100"],
+                           capture_output=True, text=True, timeout=120, env=kaggle_env(cfg))
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if p.returncode != 0:
+        return None
+    for row in csv.DictReader(io.StringIO(p.stdout)):
+        if (row.get("ref") or "").strip().lower() == slug.lower():
+            return (row.get("lastRunTime") or "").strip() or None
+    return None
 
 
 def probe_track(cfg: Config, path: Path) -> tuple[dict | None, str]:
@@ -208,7 +229,7 @@ def import_dir(cfg: Config, src: Path, source_label: str, force: bool) -> dict:
         return {"ok": False, "message": "nothing valid to import", "rejected": rejected}
 
     now = time.time()
-    batch_id = time.strftime("%Y-%m-%d_%H%M", time.localtime(now)) + "_" + fp[:6]
+    batch_id = time.strftime("%Y-%m-%d_%H%M%S", time.localtime(now)) + "_" + fp[:6]
     cfg.batches.mkdir(parents=True, exist_ok=True)
     tmp = cfg.batches / f".tmp-{batch_id}"
     shutil.rmtree(tmp, ignore_errors=True)
@@ -275,13 +296,21 @@ def main(argv=None) -> int:
             if free < cfg.min_free_gb:
                 result = {"ok": False, "message": f"only {free:.1f} GB free disk, not downloading"}
             else:
-                stage.mkdir(parents=True)
-                ok, msg = download(cfg, stage)
-                if ok:
-                    result = import_dir(cfg, stage, f"kaggle:{normalize_slug(cfg.kaggle_notebook)}",
-                                        args.force)
+                remote = remote_last_run(cfg)
+                prev = read_json(cfg.last_sync_file, {}) or {}
+                if (remote and not args.force and prev.get("ok") and list_batches(cfg)
+                        and prev.get("remote_run_time") == remote):
+                    result = {"ok": True, "new": False,
+                              "message": f"no new notebook run on Kaggle (last run {remote})"}
                 else:
-                    result = {"ok": False, "message": msg}
+                    stage.mkdir(parents=True)
+                    ok, msg = download(cfg, stage)
+                    if ok:
+                        result = import_dir(cfg, stage,
+                                            f"kaggle:{normalize_slug(cfg.kaggle_notebook)}", args.force)
+                    else:
+                        result = {"ok": False, "message": msg}
+                result["remote_run_time"] = remote
     except Exception as e:  # keep a record for `coc status` no matter what
         result = {"ok": False, "message": f"unexpected error: {e!r}"}
     finally:

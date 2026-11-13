@@ -115,7 +115,7 @@ class Session:
         except OSError:
             pass
         self.wfd = w
-        cmd = [cfg.ffmpeg, "-hide_banner", "-nostdin", "-loglevel", "warning",
+        cmd = [cfg.ffmpeg, "-hide_banner", "-nostdin", "-y", "-loglevel", "warning",
                "-nostats", "-progress", "pipe:1", "-stats_period", "1",
                "-re", "-stream_loop", "-1", "-i", str(loop),
                # ~128 x 23 ms packets: another ~3 s cushion. Keep it small so the
@@ -161,9 +161,9 @@ class Session:
                     self.out_time = t
                     self.last_advance = time.monotonic()
             elif k == "speed":
-                self.speed = v
+                self.speed = v.strip()
             elif k == "bitrate":
-                self.bitrate = v
+                self.bitrate = v.strip()
 
     def _read_stderr(self):
         for raw in self.proc.stderr:
@@ -361,6 +361,7 @@ class Streamer:
                 if self.skip_flag.is_set():
                     self.skip_flag.clear()
                     log(f"skipped: {track.title}")
+                    result = "skipped"
                     break
                 chunk = dec.stdout.read(CHUNK)
                 if not chunk:
@@ -379,10 +380,12 @@ class Streamer:
                 dec.kill()
             dec.wait()
             dec.stdout.close()
-        if result == "ok" and written == 0:
-            log(f"WARNING: track produced no audio, skipping: {track.path}")
-            if s.pending and s.pending[-1][1] is track:
-                s.pending.pop()
+        if written == 0 and s.pending and s.pending[-1][1] is track:
+            s.pending.pop()  # never announce a track nobody heard
+            if result == "ok":
+                # keep result "ok": the gap silence that follows keeps FFmpeg fed
+                # even if every file were broken
+                log(f"WARNING: track produced no audio, skipping: {track.path}")
         return result
 
     def _restart_due(self, s: Session) -> str | None:
@@ -416,6 +419,8 @@ class Streamer:
                 r = self._play(s, track)
                 if r == "ok":
                     r = self._silence(s, self.cfg.gap_seconds)
+                elif r == "skipped":
+                    r = "ok"  # go straight to the next track, no extra gap
             if r != "ok":
                 return r
 

@@ -1,0 +1,45 @@
+[Unit]
+Description=Classic of Calm - 24/7 YouTube Live stream
+Documentation=file:///opt/classic-of-calm/README.md
+After=network-online.target
+Wants=network-online.target
+# never give up restarting
+StartLimitIntervalSec=0
+
+[Service]
+Type=notify
+NotifyAccess=main
+User=stream
+Group=stream
+EnvironmentFile=-/etc/classic-of-calm/env
+Environment=PYTHONPATH=/opt/classic-of-calm PYTHONUNBUFFERED=1 HOME=/var/lib/classic-of-calm
+ExecStart=/usr/bin/python3 -m coc.streamer
+# `systemctl reload` = reconnect gracefully at the next track boundary
+ExecReload=/bin/kill -USR1 $MAINPID
+Restart=always
+RestartSec=5
+# The streamer pings the watchdog only while FFmpeg makes progress (it also
+# restarts FFmpeg itself after STALL_TIMEOUT); this catches a hung supervisor.
+WatchdogSec=180
+TimeoutStopSec=30
+KillMode=mixed
+Nice=-5
+OOMScoreAdjust=-500
+StateDirectory=classic-of-calm
+StateDirectoryMode=0755
+RuntimeDirectory=classic-of-calm
+RuntimeDirectoryMode=0755
+RuntimeDirectoryPreserve=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

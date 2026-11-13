@@ -19,6 +19,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
+from .master import AAC_HEADROOM_DB, tp_limit
 from .common import (MASTER_SR, camelot_distance, ffmpeg_loudness, from_db, parse_key, read_audio,
                      resample, run_ffmpeg, series_name, series_spec, slugify)
 
@@ -111,6 +112,8 @@ def compile_audio(items: list[dict], out_wav: str | Path, series: str = "study",
             if carry is not None and lin > 0:
                 th = np.linspace(0, np.pi / 2, lin)[:, None]
                 mixed = carry * np.cos(th) + y[:lin] * np.sin(th)
+                # equal-power sums of correlated material can exceed the ceiling: limit locally
+                mixed, _ = tp_limit(mixed.astype(np.float32), sr, spec["tp"] - AAC_HEADROOM_DB - 0.1)
                 fh.write(np.clip(mixed, -1, 1))
                 pos += lin
             body = y[lin: len(y) - lout] if lout else y[lin:]
@@ -130,7 +133,7 @@ def compile_audio(items: list[dict], out_wav: str | Path, series: str = "study",
     info["measured"] = meas
     if correct_loudness:
         gain = spec["lufs"] - meas["lufs"]
-        gain = min(gain, spec["tp"] - 0.1 - meas["true_peak"])
+        gain = min(gain, spec["tp"] - AAC_HEADROOM_DB - meas["true_peak"])
         if abs(gain) > 0.3:
             _apply_gain_stream(out_wav, gain)
             info["gain_correction_db"] = round(gain, 2)

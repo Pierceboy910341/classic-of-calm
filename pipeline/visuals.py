@@ -120,7 +120,7 @@ def _petal_sprites(colors, rng) -> list[list[Image.Image]]:
         d.ellipse([30, 40, 60, 54], fill=tuple(min(255, c + 15) for c in col) + (255,))
         base = base.filter(ImageFilter.GaussianBlur(2))
         for a in range(0, 360, 10):
-            frames.append(base.rotate(a, resample=Image.BICUBIC).resize((24, 24), Image.LANCZOS))
+            frames.append(base.rotate(a, resample=Image.BICUBIC).resize((36, 36), Image.LANCZOS))
         out.append(frames)
     return out
 
@@ -174,7 +174,7 @@ class Particles:
             spr = self.scaled.get(key)
             if spr is None:
                 s = self.sprites[key[0]][key[1]]
-                sz = max(6, int(24 * key[2]))
+                sz = max(8, int(36 * key[2]))
                 s = s.resize((sz, sz), Image.LANCZOS)
                 a = s.getchannel("A").point(lambda v, k=key[3]: int(v * k))
                 s.putalpha(a)
