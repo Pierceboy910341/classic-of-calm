@@ -31,6 +31,9 @@ import os
 
 # Kaggle sets MPLBACKEND to an inline backend that the model venv lacks; force a headless one.
 os.environ["MPLBACKEND"] = "Agg"
+# Kaggle T4/P100 are pre-Ampere: ACE-Step picks float16 there, which overflows to NaN (seen on T4, 2026-11-13).
+# ACE-Step has no dtype switch for CUDA, so _force_float32_on_pre_ampere() reuses its ROCm float32 path.
+os.environ.setdefault("ACESTEP_ROCM_DTYPE", "float32")
 import shutil
 import sys
 import tempfile
@@ -58,6 +61,30 @@ def _is_oom(text: str) -> bool:
     return "out of memory" in t or "outofmemory" in t or "cuda oom" in t
 
 
+def _force_float32_on_pre_ampere() -> None:
+    """Make ACE-Step load in float32 on GPUs without native bfloat16 (T4, P100).
+
+    initialize_service() chooses bfloat16 on Ampere+ and float16 otherwise; float16 NaNs on T4.
+    Its ROCm branch reads ACESTEP_ROCM_DTYPE (default float32). We point only the orchestrator
+    module at a gpu_config shim that reports ROCm, so nothing else in ACE-Step changes behaviour.
+    """
+    import types
+    import torch
+    if not torch.cuda.is_available() or torch.cuda.get_device_capability()[0] >= 8:
+        return
+    try:
+        from acestep import gpu_config
+        from acestep.core.generation.handler import init_service_orchestrator as orch
+    except Exception as e:  # layout changed upstream: keep going, NaN fallback still applies
+        log(f"無法套用 float32 修正（{type(e).__name__}: {e}），維持 ACE-Step 預設")
+        return
+    shim = types.ModuleType("gpu_config_float32_shim")
+    shim.__dict__.update(gpu_config.__dict__)
+    shim.is_rocm_available = lambda: True
+    orch.gpu_config = shim
+    log("GPU 不支援 bfloat16：改用 float32 執行（較慢但不會溢位）")
+
+
 class AceRunner:
     def __init__(self, args):
         self.args = args
@@ -77,6 +104,7 @@ class AceRunner:
     def load(self, dit_name: str) -> bool:
         from acestep.handler import AceStepHandler
 
+        _force_float32_on_pre_ampere()
         self.free()
         # Try the memory-saving recipe first, then progressively simpler ones.
         recipes = [
@@ -248,8 +276,10 @@ def main():
             except Exception as e:
                 err = f"{type(e).__name__}: {e}"
                 is_oom = _is_oom(err) or isinstance(e, getattr(torch.cuda, "OutOfMemoryError", ()))
-                if is_oom and attempt == 1 and runner.variant != args.fallback_dit and args.fallback_dit:
-                    log(f"  VRAM 不足（{runner.variant}），改用較小的 {args.fallback_dit} 後重試")
+                is_nan = "NaN or Inf" in err
+                if (is_oom or is_nan) and attempt == 1 and runner.variant != args.fallback_dit and args.fallback_dit:
+                    why = "VRAM 不足" if is_oom else "數值溢位（NaN）"
+                    log(f"  {why}（{runner.variant}），改用較小的 {args.fallback_dit} 後重試")
                     if runner.load(args.fallback_dit):
                         continue
                 log(f"  ✗ 失敗：{err[:400]}")
