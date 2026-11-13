@@ -1,7 +1,23 @@
+# secrets: never commit
+.env
+.env.*
+*.key
+kaggle.json
+**/credentials*.json
+**/secrets*
+
+# audio and large media stay out of git (Kaggle output / owner downloads)
+weekly/*/candidates/
+weekly/*/review/
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.mp4
+
+# unused art variants
+weekly/*/art/*_v[0-9]*.png
+
 __pycache__/
 *.pyc
-*.wav
-*.mp4
-*.m4a
-*.mp3
-.env
+.venv/

@@ -253,7 +253,7 @@
       "seed": 47115,
       "layer": {
         "instrument": "yangqin",
-        "role": "lead"
+        "role": "ornament"
       }
     },
     {
@@ -381,7 +381,7 @@
       "seed": 47123,
       "layer": {
         "instrument": "dizi",
-        "role": "lead"
+        "role": "ornament"
       }
     },
     {
@@ -413,7 +413,7 @@
       "seed": 47125,
       "layer": {
         "instrument": "erhu",
-        "role": "lead"
+        "role": "ornament"
       }
     },
     {
@@ -445,7 +445,7 @@
       "seed": 47127,
       "layer": {
         "instrument": "xiao",
-        "role": "lead"
+        "role": "ornament"
       }
     },
     {
@@ -477,7 +477,7 @@
       "seed": 47129,
       "layer": {
         "instrument": "guqin",
-        "role": "lead"
+        "role": "ornament"
       }
     },
     {
@@ -493,7 +493,7 @@
       "seed": 47130,
       "layer": {
         "instrument": "temple_bell",
-        "role": "texture"
+        "role": "bell"
       }
     }
   ],
