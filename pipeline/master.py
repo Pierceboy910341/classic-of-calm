@@ -92,7 +92,6 @@ def tp_limit(x: np.ndarray, sr: int, ceiling_db: float, lookahead_ms: float = 2.
     la = max(1, int(lookahead_ms / 1000 * sr))
     g = minimum_filter1d(req, 2 * la + 1, mode="nearest")
     g = uniform_filter1d(g, 2 * la + 1, mode="nearest")
-    g = np.minimum(g, minimum_filter1d(req, 2 * la + 1, mode="nearest") * 0 + g)  # keep dtype/shape
     # slow release on top (only ever lowers the gain further -> still safe)
     rel = np.exp(-1.0 / (0.08 * sr))
     g_rel = lfilter([1 - rel], [1, -rel], g - 1.0) + 1.0

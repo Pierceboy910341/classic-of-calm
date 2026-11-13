@@ -41,6 +41,8 @@ from .library import list_batches, list_tracks, library_signature, resolve_loop
 
 CHUNK = 64 * 1024
 F_SETPIPE_SZ = 1031
+# Harmless FFmpeg chatter caused by the design (blocking pipe = backpressure).
+NOISE = ("Guessed Channel Layout", "Thread message queue blocking")
 
 
 def iso(ts: float | None = None) -> str:
@@ -109,19 +111,21 @@ class Session:
 
         r, w = os.pipe()
         try:
-            fcntl.fcntl(w, F_SETPIPE_SZ, 1 << 20)  # ~6 s cushion between tracks
+            fcntl.fcntl(w, F_SETPIPE_SZ, 1 << 19)  # ~3 s of PCM
         except OSError:
             pass
         self.wfd = w
         cmd = [cfg.ffmpeg, "-hide_banner", "-nostdin", "-loglevel", "warning",
                "-nostats", "-progress", "pipe:1", "-stats_period", "1",
                "-re", "-stream_loop", "-1", "-i", str(loop),
-               "-thread_queue_size", "1024",
+               # ~128 x 23 ms packets: another ~3 s cushion. Keep it small so the
+               # feeder is only a few seconds ahead of what viewers hear.
+               "-thread_queue_size", "128",
                "-f", "s16le", "-ar", str(cfg.audio_rate), "-ac", "2", "-i", f"pipe:{r}",
                "-map", "0:v:0", "-map", "1:a:0",
                "-c:v", "copy",
                "-c:a", "aac", "-b:a", cfg.audio_bitrate, "-ar", str(cfg.audio_rate), "-ac", "2",
-               "-shortest", "-max_muxing_queue_size", "2048",
+               "-max_muxing_queue_size", "2048",
                "-f", cfg.stream_format]
         if cfg.stream_format == "flv":
             cmd += ["-flvflags", "no_duration_filesize"]
@@ -164,7 +168,7 @@ class Session:
     def _read_stderr(self):
         for raw in self.proc.stderr:
             line = self.mask(raw.decode(errors="replace").rstrip())
-            if line:
+            if line and not any(n in line for n in NOISE):
                 self.stderr_tail.append(line)
                 log(f"ffmpeg: {line}")
 
@@ -184,13 +188,15 @@ class Session:
             self.wfd = None
 
     def stop(self, graceful: bool):
+        audio_end = self.audio_pos / self.bytes_per_sec
         self.close_input()
-        if graceful:
-            # -shortest: ffmpeg drains the remaining audio and exits on its own.
-            try:
-                self.proc.wait(timeout=20)
-            except subprocess.TimeoutExpired:
-                pass
+        if graceful and self.alive():
+            # Let FFmpeg play out the few seconds of audio still buffered, then
+            # end the RTMP session cleanly (SIGTERM = write trailer + close).
+            deadline = time.monotonic() + 15
+            while self.alive() and self.out_time < audio_end - 0.2 and time.monotonic() < deadline:
+                time.sleep(0.2)
+            log(f"audio drained (out_time {self.out_time:.1f}/{audio_end:.1f} s), closing session")
         if self.alive():
             self.proc.terminate()
             try:
