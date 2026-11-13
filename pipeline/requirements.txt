@@ -1,0 +1,11 @@
+# Classic of Calm — pipeline (CPU only)
+# System dependency: ffmpeg CLI on PATH (Kaggle images ship it; else `apt-get install -y ffmpeg`).
+# If no system ffmpeg is available, `pip install imageio-ffmpeg` and the pipeline will use its bundled binary.
+numpy>=1.24
+scipy>=1.10
+soundfile>=0.12
+pyloudnorm>=0.1.1
+Pillow>=10.0
+# optional:
+# imageio-ffmpeg>=0.4   # fallback ffmpeg binary
+# pytest>=7             # to run pipeline/tests
