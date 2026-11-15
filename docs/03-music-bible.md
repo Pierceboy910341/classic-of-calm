@@ -675,12 +675,16 @@ YouTube 會把較大聲的影片**往下**正規化到約 -14 LUFS，但不會�
 
 ---
 
-## 附錄 A：Suno 版本（備用，若日後仍採用 Suno）
+## 附錄 A：Suno 版本（2026-11-15 起使用：每週 5 首主打曲）
 
-- 開 **Instrumental** 開關；Style 欄（v4.5／v5／v5.5 約 1,000 字元上限，會靜默截斷）；Exclude Styles 用第 2–4 節的 NEG 清單（4–6 項即可）。
-- 轉換規則：把任一模板的 CAPTION 去掉 `instrumental` 結尾，前面加 `{BPM} BPM, {KEY}, `，結尾加 `instrumental, no vocals`；LYRICS 欄放結構 tag：`[Intro] [Instrumental] [Break] [Instrumental] [Outro] [Fade Out] [End]`（Lyrics 欄**不要寫括號說明**，Suno 會唱出來）。
+> 定案（2026-11-15）：Suno Pro（每月 US$10、20 次下載、不累積）負責每週合輯的 **5 首主打曲**；其餘由 ACE-Step 1.5 生成。plan.json 欄位見 docs/05「每首歌的來源」；擁有者的複製貼上單是 `weekly/<WEEK>/suno.md`；操作手冊 `guides/06-suno.md`。
+
+- 網頁版 v5.5／v6：**Advanced** 模式；**Lyrics 欄留空**＝純音樂（若有 Instrumental 開關就打開）；**Styles** 欄約 1,000 字元上限，會靜默截斷（我們控制在 ≤ 400）；**More Options → Exclude styles** 用第 2–4 節的 NEG 清單（4–8 項短詞）；**Song Title** = plan.json 的 `title_en`（notebook 02 用歌名配對檔案）。
+- 轉換規則：把任一模板的 CAPTION 去掉 `instrumental` 結尾，前面加 `{BPM} BPM, {KEY}, `，結尾加 `instrumental, no vocals` → 寫進 `suno.styles`。
+- 舊做法（Lyrics 欄放 `[Intro] [Instrumental] … [End]` 結構 tag）暫停使用：擁有者操作以「Lyrics 留空」為準；若某首結構太散，再由 music-director 決定是否改用結構 tag（Lyrics 欄**不要寫括號說明**，Suno 會唱出來）。
+- 每首生成 2–3 次，網頁試聽免費，**只下載最好的 1 個**（每次 Download 算一次額度）。
 - Suno 不接受真實藝人名稱（會擋或忽略），一律用聲音描述。
-- 商業使用需在付費方案期間生成；每季確認 ToS。
+- 商業使用需在付費方案期間生成、下載；每季確認 ToS。
 - 單次生成約 2–4 分鐘；避免 Extend（v5.5 Extend 有時變成另一首歌）。
 
 範例：

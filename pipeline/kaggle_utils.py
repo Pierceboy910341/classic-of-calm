@@ -148,6 +148,27 @@ def load_plan(repo: str, week: str, branch: str = "main",
 # Plan validation / normalisation
 # ---------------------------------------------------------------------------
 REQUIRED_TRACK_FIELDS = ("id", "tags", "bpm", "key", "duration", "seed")
+# Suno tracks are made by the owner in the Suno web UI, not here; bpm/key/duration still drive sequencing.
+REQUIRED_SUNO_FIELDS = ("id", "title_en", "bpm", "key")
+SOURCE_SUNO = "suno"
+SOURCE_ACE = "ace-step"
+KNOWN_SOURCES = (SOURCE_ACE, SOURCE_SUNO)
+SUNO_STYLES_MAX = 1000   # Suno v4.5+ "Styles" box (music bible appendix A); silently truncated beyond
+SUNO_EXCLUDE_MAX = 1000  # UNVERIFIED exact limit for "Exclude styles"; keep it short (4-8 items)
+
+
+def track_source(track: Dict[str, Any]) -> str:
+    """'suno' or 'ace-step' (default when the field is missing)."""
+    return SOURCE_SUNO if str(track.get("source") or "").strip().lower() == SOURCE_SUNO else SOURCE_ACE
+
+
+def generated_tracks(plan: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Tracks notebook 01 must generate (everything except source=suno)."""
+    return [t for t in plan.get("tracks") or [] if isinstance(t, dict) and track_source(t) != SOURCE_SUNO]
+
+
+def suno_tracks(plan: Dict[str, Any]) -> List[Dict[str, Any]]:
+    return [t for t in plan.get("tracks") or [] if isinstance(t, dict) and track_source(t) == SOURCE_SUNO]
 
 
 def normalize_model_name(name: str) -> Optional[str]:
@@ -185,9 +206,33 @@ def validate_plan(plan: Dict[str, Any]) -> Tuple[List[str], List[str], List[str]
             errors.append(f"第 {i + 1} 首不是物件")
             continue
         n_err = len(errors)
-        missing = [f for f in REQUIRED_TRACK_FIELDS if t.get(f) in (None, "")]
+        src_raw = t.get("source")
+        if src_raw not in (None, "") and str(src_raw).strip().lower() not in KNOWN_SOURCES:
+            errors.append(f"歌曲 {label} 的 source={src_raw!r} 不認得（只能是 ace-step 或 suno）")
+        is_suno = track_source(t) == SOURCE_SUNO
+        required = REQUIRED_SUNO_FIELDS if is_suno else REQUIRED_TRACK_FIELDS
+        missing = [f for f in required if t.get(f) in (None, "")]
         if missing:
             errors.append(f"歌曲 {label} 缺少欄位：{', '.join(missing)}")
+        if is_suno:
+            sb = t.get("suno")
+            if not isinstance(sb, dict) or not str(sb.get("styles") or "").strip():
+                errors.append(f"Suno 歌曲 {label} 缺少 suno.styles（Suno 的 Styles 欄內容）")
+            else:
+                extra = set(sb) - {"styles", "exclude", "title"}
+                if extra:
+                    errors.append(f"Suno 歌曲 {label} 的 suno 區塊有多餘欄位：{', '.join(sorted(extra))}")
+                if len(str(sb.get("styles"))) > SUNO_STYLES_MAX:
+                    errors.append(f"Suno 歌曲 {label} 的 styles 超過 {SUNO_STYLES_MAX} 字元，Suno 會截斷")
+                if len(str(sb.get("exclude") or "")) > SUNO_EXCLUDE_MAX:
+                    warnings.append(f"Suno 歌曲 {label} 的 exclude 太長")
+                title = str(sb.get("title") or "")
+                if not title:
+                    warnings.append(f"Suno 歌曲 {label} 沒有 suno.title，配對會用 title_en")
+                elif t.get("title_en") and title != t.get("title_en"):
+                    warnings.append(f"Suno 歌曲 {label} 的 suno.title 與 title_en 不同（配對用 suno.title）")
+        elif t.get("suno") is not None:
+            warnings.append(f"歌曲 {label} 有 suno 區塊但 source 不是 suno（會照常用 AI 模型生成）")
         if tid:
             if not re.fullmatch(r"[A-Za-z0-9_-]+", str(tid)) or "__" in str(tid):
                 errors.append(f"歌曲 id {tid!r} 只能用英數字、- 和單一 _（不可含 __）")
@@ -201,12 +246,12 @@ def validate_plan(plan: Dict[str, Any]) -> Tuple[List[str], List[str], List[str]
         except (TypeError, ValueError):
             errors.append(f"歌曲 {label} 的 bpm 不是數字")
         try:
-            dur = float(t.get("duration", 0))
+            dur = float(t.get("duration", 0) or (180 if is_suno else 0))
             if not 10 <= dur <= 600:
                 warnings.append(f"歌曲 {label} 的 duration={dur} 超出 10–600 秒，會自動夾在範圍內")
         except (TypeError, ValueError):
             errors.append(f"歌曲 {label} 的 duration 不是數字")
-        if len(str(t.get("tags", ""))) > 512:
+        if not is_suno and len(str(t.get("tags", ""))) > 512:
             warnings.append(f"歌曲 {label} 的 tags 超過 512 字元，ACE-Step 會截斷")
         if len(errors) > n_err and tid:
             bad.append(str(tid))
@@ -214,6 +259,8 @@ def validate_plan(plan: Dict[str, Any]) -> Tuple[List[str], List[str], List[str]
             bad.append(f"#{i + 1}")
     if plan.get("week") in (None, ""):
         warnings.append("plan.json 沒有 week 欄位")
+    if not generated_tracks(plan):
+        warnings.append("plan.json 全部都是 Suno 歌曲，notebook 01 沒有要生成的歌")
     return errors, warnings, bad
 
 
@@ -313,7 +360,7 @@ def build_jobs(plan: Dict[str, Any], model: str, takes: int, out_dir: str,
     skip = set(skip_ids)
     jobs: List[Dict[str, Any]] = []
     for take in range(1, takes + 1):  # all take-1s first, so a time-out still covers every track
-        for t in plan.get("tracks", []):
+        for t in generated_tracks(plan):  # source=suno tracks come from the owner's Suno downloads
             tid = str(t.get("id", ""))
             if not tid or tid in skip or (only is not None and tid not in only):
                 continue

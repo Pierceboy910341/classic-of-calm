@@ -1,7 +1,7 @@
 """ACE-Step 1.5 generation worker — run INSIDE the ACE-Step uv venv by notebook 01.
 
     <ace_repo>/.venv/bin/python gen_ace_step.py --jobs jobs.json --results results.jsonl \
-        --deadline <epoch> --ace-dir <ace_repo> [--dit acestep-v15-xl-turbo] ...
+        --deadline <epoch> --ace-dir <ace_repo> [--dit acestep-v15-turbo | acestep-v15-xl-turbo] ...
 
 Writes one JSON line per job to --results ({"status": "ok"|"failed"|"skipped_exists", ...}).
 Exit codes: 0 = finished (maybe with per-track failures), 2 = stopped by time budget,
@@ -16,6 +16,8 @@ API source (verified 2026-11-13 against github.com/ace-step/ACE-Step-1.5 @ main)
   - generate_music(dit_handler, llm_handler_or_None, GenerationParams, GenerationConfig, save_dir)
         -> GenerationResult(success, error, audios=[{"tensor": [ch, n] float32 CPU, "sample_rate": 48000, ...}])
   - XL DiT ~9 GB bf16/fp16; "≥12 GB with offload + quantization". Kaggle T4 = 15 GB → marginal tier.
+Kaggle T4 test 2026-11-13: XL-turbo OOMs in float32 -> default is now acestep-v15-turbo (2B),
+  ~18-90 s per 60 s track. XL stays available via --dit acestep-v15-xl-turbo.
 UNVERIFIED (could not run a GPU here):
   - actual XL-turbo speed / peak VRAM on a T4 with offload_to_cpu + int8_weight_only + compile;
   - whether torchao int8 + torch.compile works on Turing (sm_75) — we fall back automatically;
@@ -211,7 +213,10 @@ def main():
     ap.add_argument("--results", required=True)
     ap.add_argument("--deadline", type=float, required=True)
     ap.add_argument("--ace-dir", required=True)
-    ap.add_argument("--dit", default="acestep-v15-xl-turbo")
+    # Default = 2B turbo: tested on a Kaggle T4 2026-11-13 (~18-90 s per 60 s of audio). XL-turbo
+    # (acestep-v15-xl-turbo) OOMs there in float32 and wastes ~4 min before falling back; still
+    # available with --dit acestep-v15-xl-turbo on bigger GPUs.
+    ap.add_argument("--dit", default="acestep-v15-turbo")
     ap.add_argument("--fallback-dit", default="acestep-v15-turbo")
     ap.add_argument("--use-lm", action="store_true")
     ap.add_argument("--lm-model", default="acestep-5Hz-lm-0.6B")

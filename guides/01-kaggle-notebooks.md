@@ -65,10 +65,13 @@
    - 👀 會出現搜尋視窗。上方篩選選 「**Your Work**」（你的作品）或 「**Notebooks**」（筆記本）。
    - 找到「Classic of Calm 01 Generate」→ 按它右邊的 「**+**」（或「Add」）。
    - 👀 Input 底下會多一個「classic-of-calm-01-generate」資料夾。
+   - 同樣的方法再加一個：篩選選「**Datasets**」→「**Your Datasets**」→ `classic-of-calm-suno`（Suno 主打曲；要先照 [06-suno.md](06-suno.md) 第 4 部分建立）。
 6. 「**Save Version**」→ 「**Quick Save**」→ 「**Save**」。
 7. 把 02 的網址也貼給 Claude（「這是 02 的網址」）。**直播主機安裝時也會用到這個網址**，請先存在記事本裡。
 
 ## 第 3 部分（選做）：讓 Stable Audio 3 也能跑
+
+> **2026-11-15 更新：目前不用做這部分。** 我們決定只用 ACE-Step（免費）＋ Suno（每週 5 首主打曲，見 [06-suno.md](06-suno.md)）。以下保留給日後需要時參考。
 
 試產週（W47）我們要比較兩個 AI 音樂模型。其中 **Stable Audio 3** 需要你先在 Hugging Face（一個放 AI 模型的網站）按「同意授權」。
 **不做也沒關係**：筆記本會自動跳過它，只用另一個模型（ACE-Step）。

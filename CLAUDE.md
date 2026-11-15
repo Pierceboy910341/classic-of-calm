@@ -28,7 +28,7 @@
 | 每週（標本） | 1 支 1–2 小時合輯，主打一隻編號異獸，說明欄附 Bestiary Card（原文＋自譯英文＋出處）|
 | 社群 | 每月 **Bestiary Census** 投票選下一隻異獸（得票最高者做 2 小時特輯）；「留下你的名字，Sing 會記得」|
 | 音樂 | 中國樂器（古箏、琵琶、簫、笛、揚琴、古琴、二胡、編鐘）× lofi；規範在 `docs/03-music-bible.md` |
-| 工具 | ACE-Step 1.5／Stable Audio 3（Kaggle 免費 GPU）、Gemini 生圖、OVHcloud VPS 24/7 直播、YouTube **手動上傳** |
+| 工具 | **Suno Pro**（每週 5 首主打曲，擁有者在網頁生成、只下載最好的 5 個，上傳私人 Kaggle Dataset `classic-of-calm-suno`）＋**ACE-Step 1.5** `acestep-v15-turbo`（Kaggle 免費 GPU，其餘曲目與直播）、Gemini 生圖、OVHcloud VPS 24/7 直播、YouTube **手動上傳**。Stable Audio 3 不再預設使用（需 HF 授權） |
 
 必讀文件：`docs/00-decisions.md`（定案）、`docs/05-system-design.md`（**建置規格，具約束力**）、`docs/03-music-bible.md`、`docs/02-brand-proposals.md` 提案 A、`docs/06-creature-roster.md`（異獸名冊與輪播表）。
 
@@ -57,21 +57,28 @@
 1. 讀 `docs/06-creature-roster.md` §1 輪播表，確認本週的 No.、異獸、系列。Census 週先看 `weekly/census/` 的投票結果；沒有結果就用預設，並告訴擁有者。
 2. **producer**：建立 `plan.json` 骨架。
 3. **mythology-researcher**：查核本週異獸的原文、英譯、出處（名冊標 ⚠️ 的一定要處理）。
-4. **music-director**：寫 `tracks`（約 30 組；試產週兩個模型各跑一次＝約 60 個候選）與 `variable_card.json`。
+4. **music-director**：寫 `tracks`（約 30 組：**5 首標 `"source": "suno"`**＝本週最強的概念、合輯主打曲，附 `suno` 區塊；其餘約 25 首 ACE-Step，notebook 01 每首做 2 版＝約 50 個候選）與 `variable_card.json`。
+   - **producer** 依 plan.json 寫 `weekly/<WEEK>/suno.md`：給擁有者的繁中複製貼上單（5 首的歌名、Styles、Exclude，「生成 2–3 次，在網頁上試聽，只下載最好的 1 個」，Kaggle dataset 上傳步驟，本月下載額度剩幾次）。範本：`weekly/2026-W47/suno.md`；手冊：`guides/06-suno.md`。
 5. 平行：**art-director** 寫 `art` 提示詞；**copywriter** 寫 `youtube` 區塊（含 AI 揭露與 Bestiary Card）。
 6. **mythology-researcher** 再看一次曲名、說明欄裡的典故說法。
-7. **producer**：合併、跑驗證腳本（JSON 格式與規格欄位完全一致）。也可以跑 `python -c "import json,pipeline.kaggle_utils as k;print(k.validate_plan(json.load(open('weekly/<WEEK>/plan.json'))))"` 確認 notebook 讀得懂。
+7. **producer**：合併、跑驗證腳本（JSON 格式與規格欄位完全一致，含 5 首 Suno 與 suno.md 一致）。也可以跑 `python -c "import json,pipeline.kaggle_utils as k;print(k.validate_plan(json.load(open('weekly/<WEEK>/plan.json'))))"` 確認 notebook 讀得懂。
 8. **art-director**：`python pipeline/gen_art.py weekly/<WEEK> --n 3` 產生候選圖，挑好後用 SendUserFile 給擁有者看最好的 2 張，問「用 1 還是 2？」。
    - 沒有 Gemini 金鑰時：不要在對話中索取金鑰。用環境的憑證功能（`request_credential`，主機 `generativelanguage.googleapis.com`，header `x-goog-api-key`）請擁有者在安全表單中填入；仍不行就先推送 plan.json，圖片之後補。
 9. `git add` → `git commit` → `git push`（見 §6）。notebook 是從 GitHub 讀 plan.json 的，**沒推送就不能生成**。
-10. 告訴擁有者：「請打開 Kaggle 的『01 Generate』，按 **Save Version → Save & Run All**，大約 2–6 小時，關掉瀏覽器也會繼續跑。明天跟我說『審核本週歌曲』。」
+10. 告訴擁有者兩件事（一次一件）：
+    - 「請打開 Kaggle 的『01 Generate』，按 **Save Version → Save & Run All**，大約 1–3 小時，關掉瀏覽器也會繼續跑。」
+    - 「這週的 5 首 Suno 主打曲，照我給的單子做（把 `suno.md` 的內容直接貼在對話裡，程式碼區塊方便複製）：每首生成 2–3 次，在網頁上聽，只下載最好的 1 個，上傳到 Kaggle 的 classic-of-calm-suno。做完跟我說『Suno 上傳好了』，然後說『審核本週歌曲』。」
+    - 本月下載額度用完時：這週不做 Suno，改從 ACE-Step 多留幾首補上，並告訴他。
 
 ### 3.2 「審核本週歌曲」（週二）
-1. **qa-engineer**：用 Kaggle API 抓 01 Generate 的輸出 → `python -m pipeline.qa …` 自動檢查 → 篩出約 30 首 → 轉成**盲聽**的 `01.mp3 … 30.mp3`（檔名不能透露是哪個模型）。
+1. **qa-engineer**：用 `python -m pipeline.kaggle_fetch`（不要用 `kaggle` CLI，它不接受環境注入的憑證）抓兩樣東西：
+   - `kernel-output piercezheng910341/classic-of-calm-01-generate weekly/<WEEK>/nb01 --only "candidates/*"`
+   - `dataset piercezheng910341/classic-of-calm-suno weekly/<WEEK>/suno_dl`（擁有者上傳的 Suno 檔，檔名不限）
+   → `python -m pipeline.qa …` 自動檢查 ACE-Step 候選 → 篩出約 20–25 首 → 轉成**盲聽**的 `01.mp3 …`（檔名不能透露任何資訊）。
+   → `python -m pipeline.qa suno …`：用歌名把 Suno 檔配對到 5 首主打曲、轉檔、自動檢查。Suno 曲擁有者已在網頁上聽過，**不再放進盲聽**；配不到、依順序配對或檢查不過的，用一句話告訴擁有者（重新下載會用掉 1 次額度，先問他）。
 2. 用 **SendUserFile** 傳試聽檔（見 §4 審核禮儀）。
-3. 擁有者回「留 1, 3, 5…」後，**qa-engineer** 寫 `selection.json`（含排序、淡出、`model_vote`），你檢查後 commit、push。
-4. 試產週：公布盲聽結果（例如「你留下的 A 模型 11 首、B 模型 7 首」），問他要不要定案主力模型；他同意後才寫進 `docs/00-decisions.md`。
-5. 告訴擁有者：「請打開 Kaggle 的『02 Assemble』，按 Save & Run All（約 1–2 小時）。跑完跟我說『本週上傳資料』。」
+3. 擁有者回「留 1, 3, 5…」後，**qa-engineer** 寫 `selection.json`（`select --suno …` 會自動加入 5 首 Suno；含排序、淡出、`model_vote`），你檢查後 commit、push（連同 `review_map.json`、`suno_map.json`）。
+4. 告訴擁有者：「請打開 Kaggle 的『02 Assemble』，先在右側 Input 把 classic-of-calm-suno 更新到最新版本，再按 Save & Run All（約 1–2 小時）。跑完跟我說『本週上傳資料』。」
 
 ### 3.3 「本週上傳資料」（週三）
 1. 抓 02 Assemble 的輸出（或讀 `weekly/<WEEK>/youtube.txt`），確認：標題 ≤ 100 字元、前 60 字元有 Study/Sleep/Work＋lofi＋樂器名、說明欄有 Bestiary Card 和 AI 揭露、章節時間碼正確、標籤 ≤ 500 字元。
@@ -110,7 +117,7 @@
 - 用 **SendUserFile** 傳 mp3 試聽檔與圖片；**檔名就是編號**（`01.mp3`、`02.mp3`…），訊息裡用同樣的編號。
 - 一批最多 10 個檔案，依編號順序傳，傳完一批再傳下一批。
 - 問題要簡單：「請回覆你想**留下**的編號，例如：留 1, 3, 5。沒提到的就不留。」接受「全部留」「1–10 都留」「都不要」等說法。
-- 試產週要盲聽：在他回答之前，不透露哪一首是哪個模型、不顯示分數或檔案代號。
+- 盲聽：在他回答之前，不透露檔案代號、分數或曲目 id。Suno 主打曲不放進盲聽（他已在 Suno 網頁上挑過）。
 - 給他的建議數量：Study／Work 合輯 1 小時約留 20–24 首；Sleep 合輯約 16–20 首（曲子較長）。留太少就告訴他「目前只夠 X 分鐘」，問他要不要補生成。
 - 圖片一次最多給 2–3 張，並說出你推薦哪一張、為什麼（一句話）。
 - 他的回覆有歧義時，用一句話複述你的理解再執行（例如「好，留下 1、3、5、8，共 4 首」）。
@@ -129,7 +136,7 @@
 5. **山海經引文必須查核**：任何原文、出處、典故說法上線前都要經 **mythology-researcher** 對照原典；名冊標 ⚠️ 的項目要在卡片上用保守寫法；英文翻譯一律自譯（現代英譯本有版權）。白澤、鯤不在《山海經》，不能當主角。
 6. **規格優先**：`docs/05-system-design.md` 的檔案格式是其他程式依賴的約定，不可自行增減欄位；要改規格先問擁有者，並通知負責那段程式的人。
 7. **文化尊重**：不用偽中文字體與刻板印象（鑼聲開場、功夫片配樂、斗笠八字鬍等）；音樂遵守音樂聖經 §1.3 黑名單。
-8. **預算**：每月約 US$5–8。生圖一週 ≤ 8 張（每張約 US$0.04–0.07），超過 20 張先問。
+8. **預算**：每月約 US$17（Suno Pro US$10＋VPS 約 US$5＋生圖約 US$2）。Suno 每月 20 次下載（每週 5 次，不累積），超過要先問。生圖一週 ≤ 8 張（每張約 US$0.04–0.07），超過 20 張先問。
 9. **不動別人的模組**：`notebooks/`、`pipeline/`（`gen_art.py` 除外）、`stream/`、`guides/` 由其他工程師負責；發現問題時用一句話告訴擁有者「需要請工程師修 X」，不要自己大改。
 
 ---
@@ -148,7 +155,7 @@
 
 | 週次 | No. | 系列 | 異獸 |
 |---|---|---|---|
-| 2026-W47 | 001 | Study（**試產週**，兩個模型盲聽比較） | 狌狌 Xingxing |
+| 2026-W47 | 001 | Study（第一週 Suno 5 首＋ACE-Step） | 狌狌 Xingxing |
 | 2026-W48 | 002 | Work（發第一次投票貼文） | 鹿蜀 Lushu |
 | 2026-W49 | 003 | Sleep | 旋龜 Xuangui |
 | 2026-W50 | 004 | Census 特輯 | 投票：文鰩魚／鳳皇／耳鼠（預設文鰩魚） |
@@ -171,16 +178,21 @@ CLAUDE.md                     本章程
 docs/00–06                    定案、研究、品牌、音樂聖經、系統規格、異獸名冊
 pipeline/gen_art.py           Gemini 生圖（art-director 使用）
 pipeline/qa.py 等             品管與後製（其他工程師負責）
+pipeline/suno.py              Suno 檔案用歌名配對、轉檔（notebook 02 與 qa-engineer 共用）
+pipeline/kaggle_fetch.py      下載 Kaggle notebook 輸出與私人 dataset（不需 kaggle CLI）
 notebooks/                    Kaggle 01 Generate／02 Assemble
 stream/                       24/7 直播主機
-weekly/<WEEK>/                plan.json、variable_card.json、art/、qa_report.json、review_map.json、selection.json、youtube.txt、copy.md
+weekly/<WEEK>/                plan.json、suno.md、variable_card.json、art/、qa_report.json、review_map.json、suno_map.json、selection.json、youtube.txt、copy.md
 weekly/census/<YYYY-MM>.md    每月投票貼文與結果
 brand/refs/                   擁有者核可的 Sing／帝江角色參考圖（gen_art.py 會自動附上）
 guides/                       給擁有者的繁中操作手冊
 ```
 
 ## 9. 目前待確認（處理到就更新這裡）
-- [ ] W47 試產週：盲聽決定 ACE-Step 1.5 與 Stable Audio 3 的主力（結果寫進 `docs/00-decisions.md`）
+- [x] 音樂來源定案（2026-11-15）：Suno Pro 每週 5 首主打＋ACE-Step 1.5 turbo，Stable Audio 3 不再預設（`docs/00-decisions.md`）
+- [ ] 擁有者訂閱 Suno Pro（記下訂閱日＝每月下載額度重算日）、建立私人 Kaggle Dataset `classic-of-calm-suno` 並加入 02 Assemble 的 Input（`guides/06-suno.md`）
+- [ ] 第一次跑通 Suno 流程後確認：Suno 網頁按鈕名稱、下載檔是否內嵌歌名、Kaggle dataset Input 是否需手動更新版本
+- [ ] 確認環境的 Kaggle 憑證能讀擁有者的私人 dataset（`python -m pipeline.kaggle_fetch dataset-files piercezheng910341/classic-of-calm-suno`）
 - [ ] Sing 與帝江的角色定稿圖，存到 `brand/refs/`
 - [ ] 名冊中標 ⚠️ 的原文（讙、鵸鵌、朏朏、冉遺之魚、旋龜、精衛）在維基文庫逐字確認
 - [ ] Gemini 生圖模型 id 每季確認一次（目前：`gemini-3.1-flash-image`，備援 `gemini-2.5-flash-image`，後者預計 2027-03-15 退役）

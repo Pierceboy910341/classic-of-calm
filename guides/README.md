@@ -31,6 +31,7 @@
 | 4 | 申請 Gemini 生圖金鑰，設定花費上限 | [05-gemini-key.md](05-gemini-key.md) | 20 分鐘 |
 | 5 | 拿到直播用的「串流金鑰」 | [03-youtube-channel.md](03-youtube-channel.md) 第 4–5 部分 | 10 分鐘 |
 | 6 | 租一台 24 小時開著的小電腦（VPS），裝好直播程式 | [04-vps-stream.md](04-vps-stream.md) | 40 分鐘 |
+| 7 | 訂閱 Suno Pro、建立私人資料集 `classic-of-calm-suno` | [06-suno.md](06-suno.md) 第 1、4 部分 | 20 分鐘 |
 
 > 第 6 步最好在「02 Assemble」**至少跑完一次**之後再做，這樣直播一開始就有歌可以播。
 > 先做也可以：直播會先播一張綠色的畫面，等有歌了會自動開始放。
@@ -41,8 +42,9 @@
 
 | 星期 | 你在 Claude 對話打這句話 | 然後你要點的地方 | 要等多久 |
 |---|---|---|---|
-| 一 | **「開始本週製作」** | Claude 給你看 2 張圖，你回「用 1」或「用 2」。<br>接著打開 Kaggle 的 **01 Generate** → 把 `WEEK` 改成 Claude 說的週次 → 「Save Version」（儲存版本）→ 「Save & Run All (Commit)」（儲存並全部執行）→ 「Save」 | 2–6 小時（可以關掉瀏覽器） |
-| 二 | **「審核本週歌曲」** | Claude 傳 01.mp3、02.mp3… 給你聽。你回「留 1, 3, 5…」。<br>接著打開 Kaggle 的 **02 Assemble** → 改 `WEEK` → 「Save Version」→ 「Save & Run All (Commit)」→ 「Save」 | 1–2 小時 |
+| 一 | **「開始本週製作」** | Claude 給你看 2 張圖，你回「用 1」或「用 2」。<br>接著打開 Kaggle 的 **01 Generate** → 把 `WEEK` 改成 Claude 說的週次 → 「Save Version」（儲存版本）→ 「Save & Run All (Commit)」（儲存並全部執行）→ 「Save」 | 1–3 小時（可以關掉瀏覽器） |
+| 一～二 | （不用打字） | 照 Claude 給的 `suno.md` 在 Suno 做 5 首主打曲，試聽後只下載最好的 5 個 → 上傳到 Kaggle 的 `classic-of-calm-suno`（New Version）→ 回 Claude 說「**Suno 上傳好了**」。詳見 [06-suno.md](06-suno.md) | 30–40 分鐘 |
+| 二 | **「審核本週歌曲」** | Claude 傳 01.mp3、02.mp3… 給你聽。你回「留 1, 3, 5…」。<br>接著打開 Kaggle 的 **02 Assemble** → 右側 Input 把 `classic-of-calm-suno` 更新到最新版 → 改 `WEEK` → 「Save Version」→ 「Save & Run All (Commit)」→ 「Save」 | 1–2 小時 |
 | 三 | **「本週上傳資料」** | 從 Kaggle 下載 `compilation.mp4` 和 `thumbnail.png` → 上 YouTube Studio 上傳，照 Claude 給的清單貼標題、說明、標籤。<br>⚠️ **「Altered or synthetic content」（變造或合成內容）一定選「Yes」（是）** | 20 分鐘 |
 | 隨時 | **「直播狀況」** | Claude 會告訴你 ✅ 正常／⚠️ 小問題／❌ 停了。必要時請你打開 YouTube Studio 看一眼 | 2 分鐘 |
 | 每月一次 | **「月投票」** | Claude 給你投票貼文，你在 YouTube Studio「Create」（建立）→「Post」（貼文）→ 選投票，貼上 | 10 分鐘 |
@@ -67,3 +69,4 @@
 - YouTube：直播的「Altered or synthetic content」揭露是否在直播設定裡有選項（上傳影片時確定有）。
 - OVHcloud：目前的 VPS 方案名稱與價格（2026 年有漲價、可能改成「VPS 2027」系列）。
 - Gemini：新帳號是否必須「預付」（Prepay，最低 US$10）才能用付費功能。
+- Suno／Kaggle Dataset：見 [06-suno.md](06-suno.md) 最後一段。

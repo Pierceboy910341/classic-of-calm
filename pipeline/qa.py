@@ -6,7 +6,13 @@ CLI
                           [--previews previews/ --top 30]
     python -m pipeline.qa previews report.json --out previews/ --top 30   # 128k mp3 + shortlist
     python -m pipeline.qa select --shortlist previews/shortlist.json --keep 1,3,5 \
-                          --week 2026-W47 --out weekly/2026-W47/selection.json
+                          --week 2026-W47 --out weekly/2026-W47/selection.json [--suno suno_wavs/]
+    python -m pipeline.qa suno <downloaded_suno_dir> --plan weekly/W/plan.json --out suno_wavs/
+                          # match the owner's Suno files to plan.json by title, convert to
+                          # <track_id>__suno__1.wav, then QA them (report: suno_wavs/qa_report.json)
+
+Suno tracks are the owner's featured picks (already chosen by ear in the browser): QA only
+reports on them; they are never in the blind shortlist and ``select --suno`` always adds them.
 
 What is measured (per file)
 ---------------------------
@@ -396,7 +402,10 @@ def export_previews(report: dict | str | Path, out_dir: str | Path, top: int = 3
     return items
 
 
-def make_selection(shortlist_items: list[dict], keep: list[int], week: str) -> dict:
+def make_selection(shortlist_items: list[dict], keep: list[int], week: str,
+                   suno_files: list[str] = ()) -> dict:
+    """``suno_files``: <track_id>__suno__1.wav names; always appended (order continues) and not
+    counted in model_vote (that vote is about the blind-reviewed generated models)."""
     by_n = {it["n"]: it for it in shortlist_items}
     picks, vote = [], {}
     for order, n in enumerate(keep, 1):
@@ -404,8 +413,12 @@ def make_selection(shortlist_items: list[dict], keep: list[int], week: str) -> d
         if not it:
             raise ValueError(f"shortlist has no item {n}")
         picks.append({"file": it["file"], "order": order, "fade_out": None, "notes": ""})
-        if it.get("model"):
+        if it.get("model") and it.get("model") != "suno":
             vote[it["model"]] = vote.get(it["model"], 0) + 1
+    have = {p["file"] for p in picks}
+    for f in sorted(suno_files):
+        if f not in have:
+            picks.append({"file": f, "order": len(picks) + 1, "fade_out": None, "notes": "suno featured"})
     return {"week": week, "picks": picks, "model_vote": vote}
 
 
@@ -427,14 +440,40 @@ def main(argv: list[str] | None = None) -> int:
         items = export_previews(a.report, a.out, a.top, a.bitrate)
         print(f"{len(items)} previews -> {a.out}")
         return 0
+    if argv and argv[0] == "suno":
+        from . import suno
+        ap = argparse.ArgumentParser(prog="pipeline.qa suno")
+        ap.add_argument("sources", nargs="+", help="folder(s) with the owner's Suno downloads")
+        ap.add_argument("--plan", required=True)
+        ap.add_argument("--out", required=True, help="dir for <track_id>__suno__1.wav + suno_map.json")
+        ap.add_argument("--repo-root", help="default: the repo that holds --plan")
+        a = ap.parse_args(argv[1:])
+        plan = load_json(a.plan)
+        root = Path(a.repo_root) if a.repo_root else Path(a.plan).resolve().parents[2]
+        srep = suno.ingest(a.sources, plan, a.out, suno.other_week_titles(root, plan.get("week", "")))
+        save_json(Path(a.out) / "suno_map.json", srep)
+        files = [Path(m["path"]) for m in srep["matches"]]
+        rep = run_qa(a.out, plan, None, None, files=files)
+        save_json(Path(a.out) / "qa_report.json", rep)
+        for m in srep["matches"]:
+            r = next((r for r in rep["files"] if r["file"] == m["file"]), {})
+            print(f"{m['track_id']:<5} {m['how']:<5} {Path(m['src']).name}  -> {r.get('status')} {r.get('score')}  "
+                  + "; ".join(f["msg"] for f in r.get("flags", []) if f["level"] != "info"))
+        for i in srep["ignored"]:
+            print(f"ignored: {Path(i['src']).name} ({i['reason']})")
+        if srep["missing"]:
+            print("MISSING Suno files for:", ", ".join(srep["missing"]))
+        return 0
     if argv and argv[0] == "select":
         ap = argparse.ArgumentParser(prog="pipeline.qa select")
         ap.add_argument("--shortlist", required=True)
         ap.add_argument("--keep", required=True, help='e.g. "1,3,5" or "留 1, 3, 5"')
         ap.add_argument("--week", required=True)
         ap.add_argument("--out", required=True)
+        ap.add_argument("--suno", help="dir from `qa suno` (its <id>__suno__1.wav are always added)")
         a = ap.parse_args(argv[1:])
-        sel = make_selection(load_json(a.shortlist), _parse_keep(a.keep), a.week)
+        sfiles = sorted(p.name for p in Path(a.suno).glob("*__suno__*.wav")) if a.suno else []
+        sel = make_selection(load_json(a.shortlist), _parse_keep(a.keep), a.week, sfiles)
         save_json(a.out, sel)
         print(f"{len(sel['picks'])} picks -> {a.out}")
         return 0

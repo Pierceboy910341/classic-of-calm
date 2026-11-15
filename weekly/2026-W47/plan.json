@@ -1,6 +1,6 @@
 {
   "week": "2026-W47",
-  "trial": true,
+  "trial": false,
   "series": "study",
   "creature": {
     "no": 1,
@@ -12,13 +12,13 @@
     "source": "南山經・招搖之山；海內南經"
   },
   "models": [
-    "ace-step-1.5",
-    "stable-audio-3"
+    "ace-step-1.5"
   ],
   "tracks": [
     {
       "id": "s01",
       "series": "study",
+      "source": "suno",
       "title_en": "Under the Migu Tree",
       "title_zh": "迷穀之下",
       "tags": "jazzy lofi hip hop, guzheng melody with gentle string bends, warm Rhodes jazz chords, upright bass, laid-back boom-bap drums, vinyl crackle, focused and calm, mountain drizzle over a glowing tree grove at late night, deep autumn, instrumental",
@@ -30,11 +30,17 @@
       "layer": {
         "instrument": "guzheng",
         "role": "ornament"
+      },
+      "suno": {
+        "styles": "80 BPM, D dorian, jazzy lofi hip hop, guzheng melody with gentle string bends, warm Rhodes jazz chords, upright bass, laid-back boom-bap drums, vinyl crackle, focused and calm, mountain drizzle over a glowing tree grove at late night, deep autumn, instrumental, no vocals",
+        "exclude": "vocals, choir, rap, gong, trap hi-hats, chinese pop",
+        "title": "Under the Migu Tree"
       }
     },
     {
       "id": "s02",
       "series": "study",
+      "source": "suno",
       "title_en": "Jade Slips at Midnight",
       "title_zh": "夜讀玉簡",
       "tags": "lofi jazz hop, low bamboo flute xiao phrases with breathy tone, detuned Rhodes minor ninth chords, soft sub bass, lazy swung drums, tape hiss, late-night study mood, 2am in a cliffside library, rolling fog, instrumental",
@@ -46,11 +52,17 @@
       "layer": {
         "instrument": "xiao",
         "role": "ornament"
+      },
+      "suno": {
+        "styles": "74 BPM, A minor, lofi jazz hop, low bamboo flute xiao phrases with breathy tone, detuned Rhodes minor ninth chords, soft sub bass, lazy swung drums, tape hiss, late-night study mood, 2am in a cliffside library, rolling fog, instrumental, no vocals",
+        "exclude": "vocals, choir, rap, gong, trap hi-hats, chinese pop",
+        "title": "Jade Slips at Midnight"
       }
     },
     {
       "id": "s03",
       "series": "study",
+      "source": "suno",
       "title_en": "Footsteps to Tangting",
       "title_zh": "堂庭之路",
       "tags": "chill boom-bap, pipa single-note melody, mellow electric piano, round upright bass, soft wooden block percussion instead of rimshot, dusty vinyl texture, contemplative, deep autumn dusk at a misty jade mountain, instrumental",
@@ -62,6 +74,11 @@
       "layer": {
         "instrument": "pipa",
         "role": "ornament"
+      },
+      "suno": {
+        "styles": "82 BPM, E dorian, chill boom-bap, pipa single-note melody, mellow electric piano, round upright bass, soft wooden block percussion instead of rimshot, dusty vinyl texture, contemplative, deep autumn dusk at a misty jade mountain, instrumental, no vocals",
+        "exclude": "vocals, choir, rap, gong, trap hi-hats, chinese pop",
+        "title": "Footsteps to Tangting"
       }
     },
     {
@@ -83,6 +100,7 @@
     {
       "id": "s05",
       "series": "study",
+      "source": "suno",
       "title_en": "Osmanthus on Zhaoyao",
       "title_zh": "招搖之桂",
       "tags": "lo-fi jazz hip hop, hammered dulcimer yangqin arpeggios, Wurlitzer chords, walking upright bass, swung hi-hats, soft kick, cassette warmth, steady and productive, deep autumn evening, terraced tea hills, instrumental",
@@ -94,11 +112,17 @@
       "layer": {
         "instrument": "yangqin",
         "role": "ornament"
+      },
+      "suno": {
+        "styles": "84 BPM, C major, lo-fi jazz hip hop, hammered dulcimer yangqin arpeggios, Wurlitzer chords, walking upright bass, swung hi-hats, soft kick, cassette warmth, steady and productive, deep autumn evening, terraced tea hills, instrumental, no vocals",
+        "exclude": "vocals, choir, rap, gong, trap hi-hats, chinese pop",
+        "title": "Osmanthus on Zhaoyao"
       }
     },
     {
       "id": "s06",
       "series": "study",
+      "source": "suno",
       "title_en": "Sing Remembers Your Name",
       "title_zh": "知人名",
       "tags": "mellow jazzhop, guzheng and Rhodes call and response, dorian mood, soft muted trumpet pad far in background, relaxed boom-bap groove, filtered breakdown, tape saturation, soft snowfall at blue hour, glowing tree grove, instrumental",
@@ -110,6 +134,11 @@
       "layer": {
         "instrument": "guzheng",
         "role": "ornament"
+      },
+      "suno": {
+        "styles": "80 BPM, E dorian, mellow jazzhop, guzheng and Rhodes call and response, dorian mood, soft muted trumpet pad far in background, relaxed boom-bap groove, filtered breakdown, tape saturation, soft snowfall at blue hour, glowing tree grove, instrumental, no vocals",
+        "exclude": "vocals, choir, rap, gong, trap hi-hats, chinese pop",
+        "title": "Sing Remembers Your Name"
       }
     },
     {
@@ -503,7 +532,7 @@
   },
   "youtube": {
     "title": "Study lofi with Xingxing, who knows your name 🏔 guzheng jazz beats [1 hour] | Classic of Calm No.01",
-    "description": "Study lofi from the Shan Hai Jing (Classic of Mountains and Seas) — Bestiary No.01: the Xingxing, the creature who knows your name.\n\nTonight Sing goes home. Under the glowing Migu trees of Zhaoyao Mountain, our small white-eared guide meets an elder of its own kind, and brings back an hour of calm for studying, reading and deep focus: jazzy lofi beats with guzheng, pipa, xiao and yangqin colours.\n\n📜 BESTIARY CARD · No.01 · 狌狌 Xingxing\nFrom the Classic of the Southern Mountains (南山經), Zhaoyao Mountain:\n「有獸焉，其狀如禺而白耳，伏行人走，其名曰狌狌。」\n\"There is a beast here shaped like an ape, with white ears. It crawls on all fours and walks upright like a person. Its name is xingxing.\"\nFrom the Classic of the Regions Within the Seas: South (海內南經):\n「狌狌知人名。」\n\"The xingxing knows people's names.\"\nA small honesty note: in that second chapter the old book describes the xingxing quite differently (\"like a pig, with a human face\"). The Shan Hai Jing often disagrees with itself. Our Sing follows the white-eared one from Zhaoyao, and keeps its gift for names.\n(English renderings are our own. The original text is over 2,000 years old and in the public domain.)\n\n💬 Sing remembers names. Leave yours in the comments and Sing will write it down.\n\n🗳 Every month you choose a future guest in the Bestiary Census (Community tab).\n\n🤖 An honest note about how this is made\nThe music is generated with open-weight AI music models whose licences allow commercial use, and the artwork with an AI image model. A small human team chooses every track, edits, sequences and masters it, and checks each creature against the original text. Sing's Listening Scroll is our way of saying it: the scroll writes, and we choose. There are no invented \"artists\" here. This video is labelled as altered or synthetic content on YouTube.\n\n🏔 Classic of Calm — Ancient creatures. Quiet hours.\n📚 Study: Zhaoyao Mountain at night · 🌙 Sleep: the Eastern Sea shore before dawn · 🍵 Work: the Huaijiang garden at noon\n🔴 24/7 radio on the channel.",
+    "description": "Study lofi from the Shan Hai Jing (Classic of Mountains and Seas) — Bestiary No.01: the Xingxing, the creature who knows your name.\n\nTonight Sing goes home. Under the glowing Migu trees of Zhaoyao Mountain, our small white-eared guide meets an elder of its own kind, and brings back an hour of calm for studying, reading and deep focus: jazzy lofi beats with guzheng, pipa, xiao and yangqin colours.\n\n📜 BESTIARY CARD · No.01 · 狌狌 Xingxing\nFrom the Classic of the Southern Mountains (南山經), Zhaoyao Mountain:\n「有獸焉，其狀如禺而白耳，伏行人走，其名曰狌狌。」\n\"There is a beast here shaped like an ape, with white ears. It crawls on all fours and walks upright like a person. Its name is xingxing.\"\nFrom the Classic of the Regions Within the Seas: South (海內南經):\n「狌狌知人名。」\n\"The xingxing knows people's names.\"\nA small honesty note: in that second chapter the old book describes the xingxing quite differently (\"like a pig, with a human face\"). The Shan Hai Jing often disagrees with itself. Our Sing follows the white-eared one from Zhaoyao, and keeps its gift for names.\n(English renderings are our own. The original text is over 2,000 years old and in the public domain.)\n\n💬 Sing remembers names. Leave yours in the comments and Sing will write it down.\n\n🗳 Every month you choose a future guest in the Bestiary Census (Community tab).\n\n🤖 An honest note about how this is made\nThe music is generated with AI: a commercial AI music service on a paid plan and an open-weight AI music model, both licensed for commercial use. The artwork is made with an AI image model. A small human team chooses every track, edits, sequences and masters it, and checks each creature against the original text. Sing's Listening Scroll is our way of saying it: the scroll writes, and we choose. There are no invented \"artists\" here. This video is labelled as altered or synthetic content on YouTube.\n\n🏔 Classic of Calm — Ancient creatures. Quiet hours.\n📚 Study: Zhaoyao Mountain at night · 🌙 Sleep: the Eastern Sea shore before dawn · 🍵 Work: the Huaijiang garden at noon\n🔴 24/7 radio on the channel.",
     "tags": [
       "study lofi",
       "lofi hip hop",

@@ -9,6 +9,9 @@ kaggle.json
 # audio and large media stay out of git (Kaggle output / owner downloads)
 weekly/*/candidates/
 weekly/*/review/
+weekly/*/nb01/
+weekly/*/suno_dl/
+weekly/*/suno_wavs/
 *.wav
 *.mp3
 *.m4a

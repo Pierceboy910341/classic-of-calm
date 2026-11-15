@@ -8,7 +8,9 @@ from nbformat.v4 import new_code_cell, new_markdown_cell, new_notebook
 
 MD_INTRO = r"""# 🎵 Classic of Calm — 01 生成候選曲（每週一）
 
-這個筆記本會讀取本週的 `plan.json`，用 AI 模型產生約 60 首候選曲，存成 WAV 檔。**你不需要看懂下面的程式。**
+這個筆記本會讀取本週的 `plan.json`，用 ACE-Step 1.5 為約 25 首歌各產生 2 個版本（約 50 個候選檔），存成 WAV 檔。**你不需要看懂下面的程式。**
+
+> 本週的 5 首 **Suno 主打曲**不在這裡生成：那 5 首由你在 Suno 網頁上做（照 `weekly/<WEEK>/suno.md`），這個筆記本會自動略過它們。
 
 ## 每週只要做這 4 步
 1. **確認右側設定（只有第一次要設，之後會記住）**
@@ -16,11 +18,11 @@ MD_INTRO = r"""# 🎵 Classic of Calm — 01 生成候選曲（每週一）
    - **Session options → Internet**：**On**（要先在 Kaggle 帳號完成手機驗證）。
    - **Add-ons → Secrets**（選填）：
      - `GITHUB_TOKEN`：只有 repo 是「私人」時才需要。
-     - `HF_TOKEN`：Stable Audio 3 若需要 Hugging Face 授權才需要；沒設會自動跳過，不影響 ACE-Step。
+     - `HF_TOKEN`：目前不需要（只有改用 Stable Audio 3 時才要）。
      - 新增後記得**勾選**它，筆記本才讀得到。
 2. **改下面「設定」格子裡的 `WEEK`**（例如 `"2026-W47"`）。Claude 會在對話裡告訴你本週要填什麼。
 3. 按右上角 **Save Version → 選 Save & Run All (Commit) → Save**。
-4. 關掉瀏覽器也沒關係。約 **2–6 小時**後，到這個筆記本的 **Output** 分頁，看到 `candidates` 資料夾就完成了。接著回 Claude 對話說：「**審核本週歌曲**」。
+4. 關掉瀏覽器也沒關係。約 **1–3 小時**後，到這個筆記本的 **Output** 分頁，看到 `candidates` 資料夾就完成了。接著回 Claude 對話說：「**審核本週歌曲**」。
 
 ## 如果出錯
 - 到 Version 的 **Log** 分頁，捲到最下面，把最後 20 行**截圖**貼給 Claude。
@@ -34,14 +36,15 @@ REPO = "Pierceboy910341/classic-of-calm"  # GitHub repo（第一次設定好就�
 BRANCH = "main"                        # 分支，通常不用改
 
 # ---- 以下是進階設定，平常不用動 ----
-TAKES_PER_MODEL = 1          # 每首歌、每個模型生成幾個版本（試產週 = 1）
-MODELS_OVERRIDE = None       # None = 照 plan.json 的 models；也可寫 ["ace-step-1.5"] 只跑一個
+TAKES_PER_MODEL = 2          # 每首歌生成幾個版本（只用 ACE-Step 後改成 2：約 50 個候選，審核時挑較好的那版）
+MODELS_OVERRIDE = None       # None = 照 plan.json 的 models（現在是 ["ace-step-1.5"]）
 ONLY_TRACKS = None           # None = 全部；測試時可寫 ["s01", "s02"]
 TIME_BUDGET_HOURS = 11.0     # Kaggle 單次上限 12 小時；預留時間保存輸出
 
 ACE_REF = "main"                      # ACE-Step-1.5 GitHub 版本（分支、tag 或 commit）
-ACE_DIT_MODEL = "acestep-v15-xl-turbo"   # 主力：XL (4B) turbo
-ACE_FALLBACK_DIT = "acestep-v15-turbo"   # VRAM 不夠時自動改用 2B turbo
+ACE_DIT_MODEL = "acestep-v15-turbo"      # 主力：2B turbo（2026-11-13 在 T4 實測可用，每首約 20–90 秒）
+ACE_FALLBACK_DIT = "acestep-v15-turbo"   # 備援（和主力相同 = 不切換）
+# 選用：ACE_DIT_MODEL = "acestep-v15-xl-turbo"（4B；T4 上 float32 會記憶體不足，只在更大的 GPU 上試）
 ACE_USE_LM = False                    # True = 開啟 5Hz 語言模型（較慢、較吃 VRAM）
 ACE_LM_MODEL = "acestep-5Hz-lm-0.6B"
 SA3_REF = "main"                      # stable-audio-3 GitHub 版本
@@ -129,14 +132,19 @@ if not tracks_all or len(bad_ids) >= len(tracks_all):
 MODELS = [ku.normalize_model_name(m) for m in MODELS_OVERRIDE] if MODELS_OVERRIDE else ku.plan_models(plan)
 MODELS = [m for m in MODELS if m]
 TAKES = max(1, int(TAKES_PER_MODEL))
-n_tracks = len([t for t in plan["tracks"] if t.get("id") not in bad_ids
+n_tracks = len([t for t in ku.generated_tracks(plan) if t.get("id") not in bad_ids
                 and (not ONLY_TRACKS or t.get("id") in ONLY_TRACKS)])
+SUNO_IDS = [t.get("id") for t in ku.suno_tracks(plan)]
 cre = plan.get("creature") or {}
 print(f"📅 週次：{plan.get('week', WEEK)}　系列：{plan.get('series')}　試產週：{plan.get('trial', False)}")
 print(f"🐾 本週異獸：{cre.get('zh', '')} {cre.get('en', '')}")
 print(f"🎼 歌曲 {n_tracks} 首 × 模型 {len(MODELS)} 個（{', '.join(MODELS)}）× 每個 {TAKES} 版 = 共 {n_tracks * len(MODELS) * TAKES} 個檔案")
+if SUNO_IDS:
+    print(f"🌟 Suno 主打曲 {len(SUNO_IDS)} 首（{', '.join(SUNO_IDS)}）：由你在 Suno 網頁製作，這裡略過")
 if bad_ids:
     print(f"   （跳過有問題的歌曲：{sorted(bad_ids)}）")
+if not n_tracks:
+    raise StopRun("❌ plan.json 裡沒有要用 ACE-Step 生成的歌（全部都是 Suno 或有錯）。請告訴 Claude。")
 
 # 若有加入上一版的輸出（Add Input → Notebook Output），把同一週已完成的歌先複製回來，避免重做
 restored = 0
@@ -272,7 +280,7 @@ EXIT_MEANING = {0: "完成", 2: "時間預算用完，安全停止", 3: "模型�
 print("✅ 工具準備好了")
 '''
 
-RUN = r'''# 5) 逐一模型生成（主力 ACE-Step 先跑；時間平均分給各模型，先跑完的會把剩餘時間讓給下一個）
+RUN = r'''# 5) 逐一模型生成（主力 ACE-Step 先跑；若 plan 有多個模型，時間平均分配，先跑完的會把剩餘時間讓給下一個）
 MODEL_SETUP = {
     ku.MODEL_ACE: dict(name="ACE-Step-1.5", url="https://github.com/ace-step/ACE-Step-1.5.git", ref=ACE_REF,
                        worker="gen_ace_step.py",

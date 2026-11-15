@@ -3,11 +3,16 @@
     python -m pipeline.run_week --week 2026-W47 --candidates <dir> --repo-root . [--out <dir>]
 
 Reads   weekly/<WEEK>/plan.json, weekly/<WEEK>/selection.json (optional), weekly/<WEEK>/art/scene.png
-        (+ art/thumbnail.png), samples/<instrument>/*.wav, candidate wavs (searched recursively).
+        (+ art/thumbnail.png), samples/<instrument>/*.wav, candidate wavs (searched recursively),
+        and with ``--suno <dir> ...`` the owner's Suno downloads (any file names; matched by title,
+        converted to <track_id>__suno__1.wav, see pipeline/suno.py).
 Writes  <out>/compilation.mp4, thumbnail.png, youtube.txt, stream_tracks/<n>_<slug>.m4a,
         stream_loop.mp4 (docs/05 "notebook 02 輸出"), plus metadata.json, chapters.json,
         qa_report.json, run_report.json.
 Without selection.json the best QA-passing take of each track is used and ordered automatically.
+Suno tracks are the week's featured tracks: whenever their files are present they are always in the
+compilation (even if QA flags them, or selection.json forgot them); missing ones are inserted where
+they fit the sequencing rules best (compile.insert_cheapest).
 """
 from __future__ import annotations
 
@@ -25,6 +30,7 @@ from . import layer as lay
 from . import master as mas
 from . import metadata as meta
 from . import qa
+from . import suno
 from . import visuals as vis
 from .common import (ffmpeg_loudness, find_audio_files, load_json, media_duration, parse_candidate_name,
                      read_audio, save_json, series_name, series_spec, slugify, write_wav)
@@ -52,6 +58,7 @@ def resolve_picks(args, plan: dict, sel: dict | None, cand_index: dict[str, Path
                   qa_report: dict) -> list[dict]:
     tracks = {t.get("id"): t for t in plan.get("tracks", [])}
     picks = []
+    suno_files = sorted(f for f in cand_index if suno.is_suno_file(f))
     if sel and sel.get("picks"):
         for p in sel["picks"]:
             f = Path(p["file"]).name
@@ -64,15 +71,22 @@ def resolve_picks(args, plan: dict, sel: dict | None, cand_index: dict[str, Path
         log.warning("no selection.json — auto-picking the best QA take per track")
         seen = set()
         for r in sorted(qa_report["files"], key=lambda r: -r["score"]):
-            if r["status"] == "fail" or r["track_id"] in seen:
+            if (r["status"] == "fail" and not suno.is_suno_file(r["file"])) or r["track_id"] in seen:
                 continue
             seen.add(r["track_id"])
             picks.append({"file": r["file"], "order": None, "fade_out": None, "notes": "auto"})
         use_order = False
     if args.max_tracks:
         picks = picks[: args.max_tracks]
+    # featured Suno tracks are always included
+    have = {p["file"] for p in picks}
+    have_ids = {parse_candidate_name(f)["track_id"] for f in have}
+    extra = [{"file": f, "order": None, "fade_out": None, "notes": "suno (auto-added)"} for f in suno_files
+             if f not in have and parse_candidate_name(f)["track_id"] not in have_ids]
+    if extra:
+        log.info("Suno featured tracks added automatically: %s", ", ".join(e["file"] for e in extra))
     items = []
-    for p in picks:
+    for p in picks + extra:
         parts = parse_candidate_name(p["file"])
         t = tracks.get(parts["track_id"], {})
         items.append({
@@ -81,8 +95,14 @@ def resolve_picks(args, plan: dict, sel: dict | None, cand_index: dict[str, Path
             "title_en": t.get("title_en") or parts["track_id"], "title_zh": t.get("title_zh"),
             "lore_note": t.get("lore_note"), "bpm": t.get("bpm"), "key": t.get("key"),
             "layer": t.get("layer"), "seed": t.get("seed"), "instrument": lead_instrument(t),
+            "source": suno.SOURCE_SUNO if suno.is_suno_file(p["file"]) else suno.SOURCE_ACE,
         })
-    return comp.order_items(items, series, use_order)
+    extra_files = {e["file"] for e in extra}
+    main_items = [it for it in items if it["file"] not in extra_files]
+    extra_items = [it for it in items if it["file"] in extra_files]
+    if use_order and main_items:
+        return comp.insert_cheapest(comp.order_items(main_items, series, True), extra_items, series)
+    return comp.order_items(items, series, False)
 
 
 def run(args) -> dict:
@@ -104,15 +124,30 @@ def run(args) -> dict:
     log.info("week %s · series %s · selection.json %s", args.week, series, "found" if sel else "MISSING")
 
     cand_index = {p.name: p for p in find_audio_files(args.candidates) if p.suffix.lower() == ".wav"}
+    # Suno featured tracks (owner downloads -> <track_id>__suno__1.wav)
+    if args.suno:
+        _step("Suno")
+        srep = suno.ingest(args.suno, plan, work / "suno", suno.other_week_titles(repo, args.week))
+        save_json(out / "suno_map.json", srep)
+        for m in srep["matches"]:
+            cand_index[m["file"]] = Path(m["path"])
+        report["steps"]["suno"] = {"expected": len(srep["expected"]), "matched": len(srep["matches"]),
+                                   "by_order": sum(1 for m in srep["matches"] if m["how"] == "order"),
+                                   "missing": srep["missing"], "ignored": len(srep["ignored"])}
+        if srep["missing"]:
+            log.warning("Suno tracks without a file: %s", ", ".join(srep["missing"]))
+    elif suno.suno_tracks(plan):
+        log.warning("plan.json has %d Suno tracks but no --suno folder was given", len(suno.suno_tracks(plan)))
     if not cand_index:
         raise SystemExit(f"no candidate wavs under {args.candidates}")
-    log.info("%d candidate wavs", len(cand_index))
+    log.info("%d candidate wavs (%d Suno)", len(cand_index), sum(1 for f in cand_index if suno.is_suno_file(f)))
 
     # 1. QA (all candidates when auto-picking, else only the picks)
     _step("QA")
     dr = tuple(args.qa_dur) if args.qa_dur else None
     if sel and sel.get("picks"):
         files = [cand_index[Path(p["file"]).name] for p in sel["picks"] if Path(p["file"]).name in cand_index]
+        files += [cand_index[f] for f in sorted(cand_index) if suno.is_suno_file(f) and cand_index[f] not in files]
     else:
         files = list(cand_index.values())
     qa_report = qa.run_qa(args.candidates, plan, series, dr, files=files)
@@ -197,6 +232,8 @@ def main(argv=None) -> int:
     ap.add_argument("--week", required=True)
     ap.add_argument("--candidates", required=True, help="dir with notebook-01 candidate wavs (searched recursively)")
     ap.add_argument("--repo-root", default=".")
+    ap.add_argument("--suno", nargs="*", default=[], help="folders/files with the owner's Suno downloads "
+                    "(e.g. /kaggle/input/classic-of-calm-suno); matched to plan.json by song title")
     ap.add_argument("--out", help="output dir (default <repo>/output/<week>)")
     ap.add_argument("--work", help="scratch dir for big intermediates (default: system temp)")
     ap.add_argument("--samples", help="samples root (default <repo>/samples)")

@@ -74,6 +74,34 @@ def order_items(items: list[dict], series: str, use_selection_order: bool) -> li
     return auto_order(items, series)
 
 
+def insert_cheapest(ordered: list[dict], extra: list[dict], series: str) -> list[dict]:
+    """Insert ``extra`` items (e.g. Suno featured tracks missing from selection.json) into an
+    already ordered list without disturbing its order: each goes where it adds the least
+    transition cost (same rules as auto_order). Never first/last when there is a choice, so
+    the owner's opening and closing tracks stay put."""
+    out = list(ordered)
+    for it in extra:
+        if not out:
+            out.append(it)
+            continue
+        best_pos, best_cost = len(out), float("inf")
+        lo, hi = (1, len(out) - 1) if len(out) >= 2 else (0, len(out))
+        for pos in range(lo, hi + 1):
+            prev = out[pos - 1] if pos > 0 else None
+            nxt = out[pos] if pos < len(out) else None
+            c = 0.0
+            if prev is not None:
+                c += transition_cost(prev, it, series)
+            if nxt is not None:
+                c += transition_cost(it, nxt, series)
+            if prev is not None and nxt is not None:
+                c -= transition_cost(prev, nxt, series)
+            if c < best_cost:
+                best_pos, best_cost = pos, c
+        out.insert(best_pos, it)
+    return out
+
+
 # ---------------------------------------------------------------------------
 # crossfaded render
 # ---------------------------------------------------------------------------

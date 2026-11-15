@@ -9,16 +9,18 @@ from nbformat.v4 import new_code_cell, new_markdown_cell, new_notebook
 MD_INTRO = r"""# 🎬 Classic of Calm — 02 組合輯（每週二）
 
 這個筆記本會把你在審核時**留下的歌**做成本週的合輯影片。**你不需要看懂下面的程式。**
-它會：疊上真實樂器音色 → 母帶處理（統一音量）→ 歌與歌之間交叉淡化 → 做出會動的循環畫面 → 組成 1–2 小時的 `compilation.mp4`，並寫好 YouTube 標題、說明和章節時間。
+它會：加入你上傳的 5 首 **Suno 主打曲** → 疊上真實樂器音色 → 母帶處理（統一音量）→ 歌與歌之間交叉淡化 → 做出會動的循環畫面 → 組成 1–2 小時的 `compilation.mp4`，並寫好 YouTube 標題、說明和章節時間。
 
 ## 每週只要做這 4 步
 1. **確認右側設定（只有第一次要設，之後會記住）**
    - **Session options → Accelerator**：選 **None**（這個筆記本只用 CPU，不需要 GPU）。
    - **Session options → Internet**：**On**。
    - **Add Input → Notebook Output**：加入「**01 Generate**」最新一版的輸出（第一次加好之後，每週會自動用最新版）。
+   - **Add Input → Datasets（Your Datasets）**：加入你的私人資料集「**classic-of-calm-suno**」（第一次加好即可）。
+     ⚠️ 每週你上傳新版本 Suno 檔案後，右側 Input 裡這個資料集旁邊若出現「更新」（Update／⟳）的提示，**請按一下更新到最新版本**，否則會用到上週的檔案。
    - **Add-ons → Secrets**（選填）：`GITHUB_TOKEN`，只有 repo 是「私人」時才需要，新增後記得**勾選**。
 2. **改下面「設定」格子裡的 `WEEK`**（和 01 Generate 用同一週，例如 `"2026-W47"`）。
-3. 確認 Claude 已經說「selection.json 已推送」，再按右上角 **Save Version → Save & Run All (Commit) → Save**。
+3. 確認 Claude 已經說「selection.json 已推送」，也確認本週 5 首 Suno 檔案已上傳到 classic-of-calm-suno，再按右上角 **Save Version → Save & Run All (Commit) → Save**。
 4. 約 **1–2 小時**後，到這個筆記本的 **Output** 分頁下載：
    - `compilation.mp4`（要上傳的影片）
    - `thumbnail.png`（縮圖）
@@ -28,6 +30,7 @@ MD_INTRO = r"""# 🎬 Classic of Calm — 02 組合輯（每週二）
 ## 如果出錯
 - 到 Version 的 **Log** 分頁，捲到最下面，把最後 20 行**截圖**貼給 Claude。
 - 找不到候選曲：通常是忘了 **Add Input → Notebook Output** 加入 01 Generate 的輸出。
+- 「找不到 Suno 主打曲」：通常是 classic-of-calm-suno 沒加入、或沒更新到最新版本。檔名不用改，筆記本會用歌名自動配對。
 - 沒有 `selection.json` 也能跑：會自動挑自動檢查分數最高的版本（但最好還是先完成審核）。
 """
 
@@ -41,6 +44,8 @@ LOOP_SECONDS = 40        # 循環動畫長度（20–60 秒）
 CAPTIONS = True          # 影片左下角顯示目前曲名
 CANDIDATES_DIR = None    # None = 自動在 /kaggle/input 裡找 01 Generate 的 candidates
 SAMPLES_DIR = None       # None = 用 repo 的 samples/；也可指定某個 Kaggle Dataset 路徑
+SUNO_DIR = None          # None = 自動找 /kaggle/input 裡的 classic-of-calm-suno（或其他放 mp3/wav 的資料集）
+REQUIRE_SUNO = True      # True = plan 有 Suno 歌、卻一首都找不到時停下來提醒你（False = 照樣做合輯）
 MAX_TRACKS = None        # 測試時可寫 3，只做前 3 首
 X264_PRESET = "medium"   # 循環畫面的編碼速度（veryfast 較快、檔案較大）
 '''
@@ -156,6 +161,37 @@ if not SAMPLES:
         SAMPLES = hits[0] if hits else f"{REPO_DIR}/samples"
 n_smp = len(glob.glob(f"{SAMPLES}/*/*.wav"))
 print(f"🪕 樂器音色：{n_smp} 個" + ("" if n_smp else "（沒有 → 這週不疊樂器，其他照常）"))
+
+# Suno 主打曲：檔名不用改，用 Suno 歌名（= plan.json 的 title_en）自動配對
+from pathlib import Path as _P
+from pipeline import suno as _suno
+SUNO_EXPECTED = _suno.suno_tracks(plan)
+SUNO_SOURCES = [SUNO_DIR] if SUNO_DIR else [str(p) for p in _suno.detect_sources("/kaggle/input", exclude=[CAND])]
+SUNO_MATCHES = []
+if SUNO_EXPECTED:
+    print(f"🌟 本週 Suno 主打曲：{len(SUNO_EXPECTED)} 首")
+    if SUNO_SOURCES:
+        _files = [f for s in SUNO_SOURCES for f in _suno._audio_under(_P(s))]
+        print(f"   找到 Suno 資料夾：{', '.join(SUNO_SOURCES)}（{len(_files)} 個音檔）")
+        SUNO_MATCHES, _ign = _suno.match_files(SUNO_EXPECTED, _files,
+                                               _suno.other_week_titles(REPO_DIR, WEEK))
+        for m in SUNO_MATCHES:
+            how = "歌名相符" if m["how"] == "title" else "⚠️ 依順序配對（歌名對不上，Claude 審核時會再確認）"
+            print(f"   ✅ {m['title']}  ←  {os.path.basename(m['src'])}（{how}）")
+        for i in _ign:
+            print(f"   ⏭️ 略過 {os.path.basename(i['src'])}（{i['reason']}）")
+    _got = {m["track_id"] for m in SUNO_MATCHES}
+    _miss = [t for t in SUNO_EXPECTED if t["id"] not in _got]
+    for t in _miss:
+        print(f"   ❌ 找不到：{_suno.suno_title(t)}")
+    if not SUNO_MATCHES and REQUIRE_SUNO:
+        raise StopRun("❌ 找不到任何 Suno 主打曲。請確認：① 右側 Add Input 已加入 classic-of-calm-suno "
+                      "② 已更新到最新版本（有新版本提示就按更新） ③ 本週 5 個檔案已上傳。\n"
+                      "   若這週真的沒有 Suno 歌，把設定格的 REQUIRE_SUNO 改成 False 再跑。")
+    if _miss:
+        print(f"   ⚠️ 還缺 {len(_miss)} 首，合輯會少這幾首（其他照常）")
+elif SUNO_SOURCES:
+    print("🌟 本週 plan.json 沒有 Suno 歌（Suno 資料夾裡的檔案不會用到）")
 '''
 
 C_RUN = r'''# 3) 執行整個後製流程（約 1–2 小時；每一步都會印出進度）
@@ -166,6 +202,8 @@ if not CAPTIONS:
     cmd.append("--no-captions")
 if MAX_TRACKS:
     cmd += ["--max-tracks", str(MAX_TRACKS)]
+if SUNO_EXPECTED and SUNO_SOURCES:
+    cmd += ["--suno", *SUNO_SOURCES]
 print("▶️ 開始：", " ".join(cmd[2:]))
 proc = subprocess.Popen(cmd, cwd=REPO_DIR, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
 tail = []
