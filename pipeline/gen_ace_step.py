@@ -87,6 +87,27 @@ def _force_float32_on_pre_ampere() -> None:
     log("GPU 不支援 bfloat16：改用 float32 執行（較慢但不會溢位）")
 
 
+# Quality preset, managed in GitHub so the owner never has to re-import the notebook.
+# 2026-11-22: owner found turbo "barely acceptable" vs Suno -> try the 50-step SFT model with
+# the 5Hz LM planner ("thinking"). Falls back to turbo on OOM/NaN. Set to None to obey the notebook.
+QUALITY_PRESET = {
+    "dit": "acestep-v15-sft",
+    "fallback_dit": "acestep-v15-turbo",
+    "use_lm": True,
+    "lm_model": "acestep-5Hz-lm-0.6B",
+    "steps": 50,
+    "guidance": 7.0,
+}
+
+
+def _apply_quality_preset(args) -> None:
+    if not QUALITY_PRESET:
+        return
+    for k, v in QUALITY_PRESET.items():
+        setattr(args, k, v)
+    log(f"使用 GitHub 上的品質設定：{QUALITY_PRESET}")
+
+
 class AceRunner:
     def __init__(self, args):
         self.args = args
@@ -146,6 +167,7 @@ class AceRunner:
 
     def _load_lm(self):
         try:
+            import torch
             from acestep.llm_inference import LLMHandler
 
             llm = LLMHandler()
@@ -155,6 +177,8 @@ class AceRunner:
                 backend="pt",  # vLLM KV cache is too hungry next to an offloaded XL DiT on 15 GB
                 device="cuda",
                 offload_to_cpu=True,
+                # LM defaults to bfloat16, which pre-Ampere GPUs (T4/P100) only emulate; use float32 there.
+                dtype=(None if torch.cuda.get_device_capability()[0] >= 8 else torch.float32),
             )
             if ok:
                 self.llm = llm
@@ -181,7 +205,7 @@ class AceRunner:
             keyscale=job.get("keyscale") or "",
             timesignature="4",
             duration=float(job["duration"]),
-            inference_steps=self.args.steps if self.args.steps else (8 if turbo else 50),
+            inference_steps=8 if turbo else (self.args.steps or 50),  # turbo is distilled for 8 steps
             seed=int(job["seed"]),
             shift=3.0 if turbo else 1.0,          # INFERENCE.md: set shift=3.0 for turbo
             guidance_scale=self.args.guidance,    # ignored (forced 1.0) by turbo models
@@ -224,6 +248,7 @@ def main():
     ap.add_argument("--guidance", type=float, default=7.0)
     ap.add_argument("--no-quant", action="store_true")
     args = ap.parse_args()
+    _apply_quality_preset(args)
 
     with open(args.jobs, encoding="utf-8") as f:
         jobs = json.load(f)
