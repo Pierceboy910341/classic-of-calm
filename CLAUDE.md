@@ -15,6 +15,14 @@
 
 ---
 
+## 0.5 目前模式：零預算（2026-11-23 擁有者定案，優先於下面所有 Suno／Gemini 付費／VPS 步驟）
+
+- **音樂全部用 ACE-Step 1.5**（Kaggle 免費 GPU，品質設定：`acestep-v15-sft` 50 步＋5Hz LM 規劃）。**不用 Suno**：plan.json 不標 `"source": "suno"`、不寫 `suno.md`、不提醒上傳 Suno、§3.2 跳過 Suno 下載與配對。約 30 組提示詞，每首 2–3 版；後製自動做 ACE-Step 清理（`pipeline/master.py` `ACE_CLEANUP_AF`）。
+- **Kaggle 可以由你（Claude）直接啟動**：用 Kaggle API `SaveKernel` 重送 01 Generate（設定與 Kaggle 上的 notebook 相同、只改 `WEEK`），不必叫擁有者按按鈕；免費 GPU 有時要排隊數小時，先告訴他。
+- **插畫**：不花錢。先試 Gemini API 免費額度；不行就暫停生圖，跟擁有者說一聲（開源模型方案待建）。
+- **24/7 直播暫停**（不租 VPS）。§3.4「直播狀況」回答「直播目前暫停（零預算）」。
+- **每月預算 US$0**。有收益後再依序恢復：Suno Pro → VPS 直播 → 付費生圖，恢復前先問擁有者。
+
 ## 1. 品牌精華（細節見 docs/）
 
 | 項目 | 內容 |
@@ -155,18 +163,20 @@
 
 | 週次 | No. | 系列 | 異獸 |
 |---|---|---|---|
-| 2026-W47 | 001 | Study（第一週 Suno 5 首＋ACE-Step） | 狌狌 Xingxing |
-| 2026-W48 | 002 | Work（發第一次投票貼文） | 鹿蜀 Lushu |
-| 2026-W49 | 003 | Sleep | 旋龜 Xuangui |
-| 2026-W50 | 004 | Census 特輯 | 投票：文鰩魚／鳳皇／耳鼠（預設文鰩魚） |
-| 2026-W51 | 005 | Study（發第二次投票貼文） | 灌灌 Guanguan |
-| 2026-W52 | 006 | Sleep（冬至） | 燭陰 Zhuyin |
-| 2026-W53 | 007 | Work（跨年） | 當康 Dangkang |
-| 2027-W01 | 008 | Census 特輯 | 投票：鸞鳥／夔／讙（預設鸞鳥） |
-| 2027-W02 | 009 | Study（發第三次投票貼文） | 精衛 Jingwei |
-| 2027-W03 | 010 | Work：Dandan Session | 帝江（Dandan） |
-| 2027-W04 | 011 | Sleep | 冉遺之魚 Ranyi fish |
-| 2027-W05 | 012 | Census 特輯 | 投票：天馬／乘黃／英招（預設天馬） |
+| 2026-W48 | 001 | Study（第一集，全部 ACE-Step） | 狌狌 Xingxing |
+| 2026-W49 | 002 | Work（發第一次投票貼文） | 鹿蜀 Lushu |
+| 2026-W50 | 003 | Sleep | 旋龜 Xuangui |
+| 2026-W51 | 004 | Census 特輯 | 投票：文鰩魚／鳳皇／耳鼠（預設文鰩魚） |
+| 2026-W52 | 005 | Sleep（冬至；發第二次投票貼文） | 燭陰 Zhuyin |
+| 2026-W53 | 006 | Work（跨年） | 當康 Dangkang |
+| 2027-W01 | 007 | Study | 灌灌 Guanguan |
+| 2027-W02 | 008 | Census 特輯 | 投票：鸞鳥／夔／讙（預設鸞鳥） |
+| 2027-W03 | 009 | Study | 精衛 Jingwei |
+| 2027-W04 | 010 | Work：Dandan Session（發第三次投票貼文） | 帝江（Dandan） |
+| 2027-W05 | 011 | Sleep | 冉遺之魚 Ranyi fish |
+| 2027-W06 | 012 | Census 特輯 | 投票：天馬／乘黃／英招（預設天馬） |
+
+（2026-W47 是試產週，沒有播出；整體順延一週。）
 
 ---
 
