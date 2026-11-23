@@ -170,6 +170,21 @@ class AceRunner:
             import torch
             from acestep.llm_inference import LLMHandler
 
+            # LLMHandler.initialize does not download; fetch the LM checkpoint first (Kaggle run 2026-11-22).
+            try:
+                from pathlib import Path
+                from acestep.model_downloader import ensure_lm_model
+
+                ok_dl, dl_msg = ensure_lm_model(
+                    self.args.lm_model,
+                    checkpoints_dir=Path(self.args.ace_dir) / "checkpoints",
+                    prefer_source="huggingface",
+                )
+                if not ok_dl:
+                    log(f"LM 下載失敗：{str(dl_msg)[:300]}")
+            except Exception as e:
+                log(f"LM 下載例外：{e}")
+
             llm = LLMHandler()
             msg, ok = llm.initialize(
                 checkpoint_dir=os.path.join(self.args.ace_dir, "checkpoints"),
