@@ -165,6 +165,8 @@ def run(args) -> dict:
     per_track = []
     for n, it in enumerate(items, 1):
         x, sr = read_audio(it["src"])
+        if it.get("source") != suno.SOURCE_SUNO:
+            x = mas.ace_cleanup(x, sr)
         x, linfo = lay.layer_track(x, sr, it.get("layer"), args.samples or (repo / "samples"), series,
                                    seed=int(it.get("seed") or n))
         y, msr, minfo = mas.master_track(x, sr, series, it.get("fade_out"))

@@ -13,8 +13,8 @@ import numpy as np
 from scipy.ndimage import minimum_filter1d, uniform_filter1d
 from scipy.signal import butter, lfilter, resample_poly, sosfilt
 
-from .common import (MASTER_SR, db, from_db, integrated_lufs, read_audio, resample, series_name,
-                     series_spec, true_peak_db, write_wav)
+from .common import (MASTER_SR, db, from_db, integrated_lufs, read_audio, resample, run_ffmpeg,
+                     series_name, series_spec, true_peak_db, write_wav)
 from .qa import ending_energy, silence_bounds
 
 log = logging.getLogger("pipeline.master")
@@ -194,15 +194,46 @@ def master_track(x: np.ndarray, sr: int, series: str = "study", fade_out=None,
     return x.astype(np.float32), sr, info
 
 
+# ACE-Step 1.5 clean-up, applied to raw ACE-Step output before layering/mastering (not to Suno).
+# Owner A/B test 2026-11-23 (review-test 09 -> 13): raw SFT output put ~half its energy below 60 Hz
+# ("muffled bass") and had little above 6 kHz; a plain mud cut made it worse, brightening alone exposed hiss.
+# This chain = rumble high-pass + bass/mid definition + gentle air + light denoise + hiss low-pass.
+ACE_CLEANUP_AF = ",".join([
+    "afftdn=nr=10:nf=-45:tn=1",
+    "highpass=f=55:poles=2", "highpass=f=55:poles=2",
+    "equalizer=f=40:t=q:w=1:g=-6",
+    "equalizer=f=110:t=q:w=1:g=1.5",
+    "equalizer=f=900:t=q:w=1:g=2",
+    "equalizer=f=2500:t=q:w=1:g=2.5",
+    "highshelf=f=5000:g=2.5",
+    "lowpass=f=13000",
+])
+
+
+def ace_cleanup(x: np.ndarray, sr: int) -> np.ndarray:
+    import tempfile
+    from pathlib import Path
+    with tempfile.TemporaryDirectory() as td:
+        src, dst = Path(td) / "in.wav", Path(td) / "out.wav"
+        write_wav(src, x, sr, subtype="FLOAT")
+        run_ffmpeg(["-i", src, "-af", ACE_CLEANUP_AF, "-c:a", "pcm_f32le", dst])
+        y, ysr = read_audio(dst)
+    y = resample(y, ysr, sr) if ysr != sr else y
+    return y[: len(x)].astype(np.float32)
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="pipeline.master")
     ap.add_argument("inp")
     ap.add_argument("out")
     ap.add_argument("--series", default="study")
     ap.add_argument("--fade-out", default=None)
+    ap.add_argument("--ace-cleanup", action="store_true", help="apply ACE_CLEANUP_AF first (raw ACE-Step output)")
     a = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     x, sr = read_audio(a.inp)
+    if a.ace_cleanup:
+        x = ace_cleanup(x, sr)
     y, sr, info = master_track(x, sr, a.series, a.fade_out)
     write_wav(a.out, y, sr)
     print(info)

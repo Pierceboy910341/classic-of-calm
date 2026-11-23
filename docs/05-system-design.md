@@ -124,3 +124,4 @@ Suno 曲的 `file` 一律是 `<track_id>__suno__1.wav`；`model_vote` 只計盲�
 - Study／Work：-14 LUFS、-1 dBTP；Sleep：-16 LUFS、-1.5 dBTP
 - 交叉淡化：Study 3–5 秒、Work 2–4 秒、Sleep 6–10 秒
 - 疊加樂器的響度比伴奏低 6–12 dB，送進共用殘響，讓聲音融在一起
+- ACE-Step 曲在疊加前先做清理（`pipeline/master.py` 的 `ACE_CLEANUP_AF`：去超低頻轟聲、補貝斯與中音輪廓、輕補高音、輕度降噪、切 13 kHz 以上嘶聲）；Suno 曲不做。2026-11-23 擁有者試聽確認（原始 SFT 輸出約一半能量在 60 Hz 以下，聽感「低音很悶」）
