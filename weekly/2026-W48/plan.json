@@ -494,6 +494,198 @@
         "instrument": "temple_bell",
         "role": "bell"
       }
+    },
+    {
+      "id": "s21",
+      "series": "study",
+      "title_en": "Where Zhaoyao Looks to the Sea",
+      "title_zh": "招搖望海",
+      "tags": "acoustic lofi hip hop, fingerpicked nylon guitar, bright pipa answering phrases, soft electric piano, tight lofi drums with shaker, melodic bass, warm and upbeat, deep autumn dusk at a cliffside library, instrumental",
+      "negative": "vocals, singing, choir, rap, gong crash, cymbal crash, trap hi-hats, edm, chinese pop, opera",
+      "bpm": 84,
+      "key": "A mixolydian",
+      "duration": 180,
+      "seed": 48121,
+      "layer": {
+        "instrument": "pipa",
+        "role": "ornament"
+      }
+    },
+    {
+      "id": "s22",
+      "series": "study",
+      "title_en": "A Migu Blossom Behind the Ear",
+      "title_zh": "耳上迷穀",
+      "tags": "tea-house lofi, mellow guitar chords maj7 and add9, short bamboo flute dizi melody in low register, brushed snare, soft kick, wooden block accents, gentle tape warmth, golden hour at a hidden valley spring, early winter sunlight, instrumental",
+      "negative": "vocals, singing, choir, rap, gong crash, cymbal crash, trap hi-hats, edm, chinese pop, opera",
+      "bpm": 82,
+      "key": "D major",
+      "duration": 185,
+      "seed": 48122,
+      "layer": {
+        "instrument": "dizi",
+        "role": "ornament"
+      }
+    },
+    {
+      "id": "s23",
+      "series": "study",
+      "title_en": "Fog Walk with a Migu Sprig",
+      "title_zh": "霧行佩迷穀",
+      "tags": "lofi guitar hip hop, warm fingerstyle guitar loop, guzheng arpeggios blending with guitar, light jazz chords on Rhodes, crisp swung hi-hat, round bass, small room reverb, laid-back and bright, rolling fog blue hour, bamboo forest path, instrumental",
+      "negative": "vocals, singing, choir, rap, gong crash, cymbal crash, trap hi-hats, edm, chinese pop, opera",
+      "bpm": 80,
+      "key": "E minor",
+      "duration": 180,
+      "seed": 48123,
+      "layer": {
+        "instrument": "guzheng",
+        "role": "texture"
+      }
+    },
+    {
+      "id": "s24",
+      "series": "study",
+      "title_en": "Gold and Jade at First Light",
+      "title_zh": "金玉晨光",
+      "tags": "chillhop acoustic, hopeful and light, pipa melody with gentle slides, nylon guitar chords, soft string pad, shaker and clapper percussion, relaxed boom-bap kick, melodic bass, midwinter morning at a misty jade mountain, instrumental",
+      "negative": "vocals, singing, choir, rap, gong crash, cymbal crash, trap hi-hats, edm, chinese pop, opera",
+      "bpm": 86,
+      "key": "G major",
+      "duration": 175,
+      "seed": 48124,
+      "layer": {
+        "instrument": "pipa",
+        "role": "ornament"
+      }
+    },
+    {
+      "id": "s25",
+      "series": "study",
+      "title_en": "Osmanthus Shade, Open Book",
+      "title_zh": "桂蔭展卷",
+      "tags": "acoustic chill hop, focused daytime groove, guitar and pipa interplay, warm bass guitar, brushed drums, short dizi phrase in the bridge, natural and clean, deep autumn afternoon, ancient pine shrine, instrumental",
+      "negative": "vocals, singing, choir, rap, gong crash, cymbal crash, trap hi-hats, edm, chinese pop, opera",
+      "bpm": 82,
+      "key": "A minor",
+      "duration": 185,
+      "seed": 48125,
+      "layer": {
+        "instrument": "dizi",
+        "role": "ornament"
+      }
+    },
+    {
+      "id": "s26",
+      "series": "study",
+      "title_en": "Blossom-Light on Still Water",
+      "title_zh": "花光照水",
+      "tags": "daytime chill beats, bright and steady, nylon guitar arpeggios, guzheng countermelody, crisp rimshot groove with wooden block, warm sub bass, gentle sidechain, polished warm mix, early winter late night, moonlit lake, instrumental",
+      "negative": "vocals, singing, choir, rap, gong crash, cymbal crash, trap hi-hats, edm, chinese pop, opera",
+      "bpm": 84,
+      "key": "E dorian",
+      "duration": 180,
+      "seed": 48126,
+      "layer": {
+        "instrument": "guzheng",
+        "role": "ornament"
+      }
+    },
+    {
+      "id": "s27",
+      "series": "study",
+      "title_en": "White Ears in the Rain",
+      "title_zh": "雨中白耳",
+      "tags": "ambient lofi, hazy and nostalgic, detuned cassette pad, low xiao melody with long silences, muffled soft kick, light rain on roof tiles, dark warm mix, long fade out, 2am in a cliffside library, instrumental",
+      "negative": "vocals, singing, choir, rap, gong crash, cymbal crash, trap hi-hats, edm, chinese pop, opera",
+      "bpm": 72,
+      "key": "D minor",
+      "duration": 195,
+      "seed": 48127,
+      "layer": {
+        "instrument": "xiao",
+        "role": "ornament"
+      }
+    },
+    {
+      "id": "s28",
+      "series": "study",
+      "title_en": "A Name Kept on Bamboo",
+      "title_zh": "竹上留名",
+      "tags": "ambient lofi, hazy and nostalgic, detuned cassette pad, low xiao melody with long silences, muffled soft kick, light rain on roof tiles, dark warm mix, long fade out, late night in a glowing tree grove, instrumental",
+      "negative": "vocals, singing, choir, rap, gong crash, cymbal crash, trap hi-hats, edm, chinese pop, opera",
+      "bpm": 74,
+      "key": "G dorian",
+      "duration": 190,
+      "seed": 48128,
+      "layer": {
+        "instrument": "xiao",
+        "role": "ornament"
+      }
+    },
+    {
+      "id": "s29",
+      "series": "study",
+      "title_en": "First Snow on Zhaoyao",
+      "title_zh": "招搖初雪",
+      "tags": "lofi sleep beat, soothing, soft electric piano chords, gentle half-time brushed groove, warm round bass, guzheng single notes far in the background, very low vinyl hiss, slow filter sweeps, first snow at late night, bamboo forest path, instrumental",
+      "negative": "vocals, singing, choir, rap, gong crash, cymbal crash, trap hi-hats, edm, chinese pop, opera",
+      "bpm": 76,
+      "key": "C major",
+      "duration": 185,
+      "seed": 48129,
+      "layer": {
+        "instrument": "guzheng",
+        "role": "texture"
+      }
+    },
+    {
+      "id": "s30",
+      "series": "study",
+      "title_en": "Drizzle on the Bamboo Slips",
+      "title_zh": "竹簡細雨",
+      "tags": "lofi sleep beat, soothing, soft electric piano chords, gentle half-time brushed groove, warm round bass, guzheng single notes far in the background, very low vinyl hiss, slow filter sweeps, mountain drizzle at 2am, misty jade mountain, instrumental",
+      "negative": "vocals, singing, choir, rap, gong crash, cymbal crash, trap hi-hats, edm, chinese pop, opera",
+      "bpm": 78,
+      "key": "A dorian",
+      "duration": 190,
+      "seed": 48130,
+      "layer": {
+        "instrument": "guqin",
+        "role": "ornament"
+      }
+    },
+    {
+      "id": "s31",
+      "series": "study",
+      "title_en": "Indigo Jacket, Lamp Turned Low",
+      "title_zh": "靛衣燈低",
+      "tags": "sleep lofi, felt piano lullaby, sparse plucked zither notes, muffled soft kick, brushed snare very quiet, warm round bass, low-pass filtered, frosty air at 3am, cozy deep autumn night, moonlit lake, instrumental",
+      "negative": "vocals, singing, choir, rap, gong crash, cymbal crash, trap hi-hats, edm, chinese pop, opera",
+      "bpm": 70,
+      "key": "F major",
+      "duration": 200,
+      "seed": 48131,
+      "layer": {
+        "instrument": "guqin",
+        "role": "ornament"
+      }
+    },
+    {
+      "id": "s32",
+      "series": "study",
+      "title_en": "Above the Clouds of the Southern Mountains",
+      "title_zh": "南山雲上",
+      "tags": "ambient lofi, slow guzheng harmonics, warm analog pads, soft felt piano, no drums, gentle sub drone, distant light rain, wide soft reverb, sleepy and peaceful, midwinter blue hour over a sea of clouds, instrumental",
+      "negative": "vocals, singing, choir, rap, gong crash, cymbal crash, trap hi-hats, edm, chinese pop, opera",
+      "bpm": 70,
+      "key": "D major",
+      "duration": 195,
+      "seed": 48132,
+      "layer": {
+        "instrument": "guzheng",
+        "role": "texture"
+      }
     }
   ],
   "art": {

@@ -328,6 +328,136 @@
       "texture_cn": "temple_bell",
       "caption_chars": 238,
       "lore_note": "A sleep track for the hours before dawn."
+    },
+    {
+      "id": "s21",
+      "template": "C01",
+      "season": "deep autumn",
+      "time": "dusk",
+      "scene": "cliffside library",
+      "lead_cn": "pipa",
+      "texture_cn": null,
+      "caption_chars": 216,
+      "lore_note": "Zhaoyao Mountain 'looks down over the Western Sea'."
+    },
+    {
+      "id": "s22",
+      "template": "C03",
+      "season": "early winter",
+      "time": "golden hour",
+      "scene": "hidden valley spring",
+      "lead_cn": "dizi",
+      "texture_cn": "muyu",
+      "caption_chars": 242,
+      "lore_note": "Sing wears a glowing migu blossom behind one ear; the text says whoever wears migu will not lose their way."
+    },
+    {
+      "id": "s23",
+      "template": "C04",
+      "weather": "rolling fog",
+      "time": "blue hour",
+      "scene": "bamboo forest path",
+      "lead_cn": null,
+      "texture_cn": "guzheng",
+      "caption_chars": 248,
+      "lore_note": "Wear a migu blossom and you will not lose your way, even in fog."
+    },
+    {
+      "id": "s24",
+      "template": "C05",
+      "season": "midwinter",
+      "scene": "misty jade mountain",
+      "lead_cn": "pipa",
+      "texture_cn": null,
+      "caption_chars": 232,
+      "lore_note": "The text says Zhaoyao holds much gold and jade."
+    },
+    {
+      "id": "s25",
+      "template": "C07",
+      "season": "deep autumn",
+      "scene": "ancient pine shrine",
+      "lead_cn": "pipa",
+      "texture_cn": "dizi",
+      "caption_chars": 212,
+      "lore_note": "The text says Zhaoyao Mountain is thick with osmanthus (gui) trees."
+    },
+    {
+      "id": "s26",
+      "template": "C09",
+      "season": "early winter",
+      "time": "late night",
+      "scene": "moonlit lake",
+      "lead_cn": "guzheng",
+      "texture_cn": "muyu",
+      "caption_chars": 230,
+      "lore_note": "The migu's blossoms shine in all four directions."
+    },
+    {
+      "id": "s27",
+      "template": "L07",
+      "time": "2am",
+      "scene": "cliffside library",
+      "lead_cn": "xiao",
+      "texture_cn": null,
+      "caption_chars": 207,
+      "lore_note": "The xingxing of Zhaoyao has white ears. Ours uses them to listen to the rain."
+    },
+    {
+      "id": "s28",
+      "template": "L07",
+      "time": "late night",
+      "scene": "glowing tree grove",
+      "lead_cn": "xiao",
+      "texture_cn": null,
+      "caption_chars": 215,
+      "lore_note": "'The xingxing knows people's names.' Leave yours, and Sing will remember it."
+    },
+    {
+      "id": "s29",
+      "template": "L09",
+      "weather": "first snow",
+      "time": "late night",
+      "scene": "bamboo forest path",
+      "lead_cn": null,
+      "texture_cn": "guzheng",
+      "caption_chars": 248,
+      "lore_note": "Zhaoyao is the first mountain of the Classic of the Southern Mountains."
+    },
+    {
+      "id": "s30",
+      "template": "L09",
+      "weather": "mountain drizzle",
+      "time": "2am",
+      "scene": "misty jade mountain",
+      "lead_cn": null,
+      "texture_cn": "guzheng",
+      "caption_chars": 248,
+      "lore_note": "Sing carries its notes the old way: on bamboo slips."
+    },
+    {
+      "id": "s31",
+      "template": "L03",
+      "season": "deep autumn",
+      "weather": "frosty air",
+      "time": "3am",
+      "scene": "moonlit lake",
+      "lead_cn": null,
+      "texture_cn": "guzheng",
+      "caption_chars": 211,
+      "lore_note": "Sing, in its indigo jacket, keeps reading after the lamp is turned low."
+    },
+    {
+      "id": "s32",
+      "template": "L01",
+      "season": "midwinter",
+      "weather": "light rain",
+      "time": "blue hour",
+      "scene": "sea of clouds",
+      "lead_cn": "guzheng",
+      "texture_cn": null,
+      "caption_chars": 214,
+      "lore_note": "Zhaoyao heads the first range of the Southern Mountains, the Magpie Mountains."
     }
   ]
 }
