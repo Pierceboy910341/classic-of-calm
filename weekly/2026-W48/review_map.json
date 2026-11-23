@@ -544,5 +544,215 @@
    "tempo_stability": 1.0
   },
   "notes": ""
+ },
+ {
+  "n": 27,
+  "file": "s27__ace-step-1.5__2.wav",
+  "preview": "27.mp3",
+  "track_id": "s27",
+  "model": "ace-step-1.5",
+  "title_en": "White Ears in the Rain",
+  "score": 100,
+  "status": "pass",
+  "duration_s": 195.0,
+  "suggested_fade_out": null,
+  "rhythm": {
+   "file": "s27__ace-step-1.5__2.wav",
+   "global_bpm": 71.8,
+   "pulse_clarity": 0.407,
+   "local_clarity_med": 0.39,
+   "local_clarity_p10": 0.326,
+   "tempo_stability": 0.947
+  },
+  "notes": ""
+ },
+ {
+  "n": 28,
+  "file": "s29__ace-step-1.5__1.wav",
+  "preview": "28.mp3",
+  "track_id": "s29",
+  "model": "ace-step-1.5",
+  "title_en": "First Snow on Zhaoyao",
+  "score": 94,
+  "status": "warn",
+  "duration_s": 185.0,
+  "suggested_fade_out": null,
+  "rhythm": {
+   "file": "s29__ace-step-1.5__1.wav",
+   "global_bpm": 76.0,
+   "pulse_clarity": 0.58,
+   "local_clarity_med": 0.559,
+   "local_clarity_p10": 0.343,
+   "tempo_stability": 0.972
+  },
+  "notes": ""
+ },
+ {
+  "n": 29,
+  "file": "s25__ace-step-1.5__1.wav",
+  "preview": "29.mp3",
+  "track_id": "s25",
+  "model": "ace-step-1.5",
+  "title_en": "Osmanthus Shade, Open Book",
+  "score": 98,
+  "status": "pass",
+  "duration_s": 185.0,
+  "suggested_fade_out": null,
+  "rhythm": {
+   "file": "s25__ace-step-1.5__1.wav",
+   "global_bpm": 83.4,
+   "pulse_clarity": 0.654,
+   "local_clarity_med": 0.642,
+   "local_clarity_p10": 0.501,
+   "tempo_stability": 0.972
+  },
+  "notes": ""
+ },
+ {
+  "n": 30,
+  "file": "s28__ace-step-1.5__1.wav",
+  "preview": "30.mp3",
+  "track_id": "s28",
+  "model": "ace-step-1.5",
+  "title_en": "A Name Kept on Bamboo",
+  "score": 98,
+  "status": "pass",
+  "duration_s": 190.0,
+  "suggested_fade_out": 6.0,
+  "rhythm": {
+   "file": "s28__ace-step-1.5__1.wav",
+   "global_bpm": 73.8,
+   "pulse_clarity": 0.657,
+   "local_clarity_med": 0.634,
+   "local_clarity_p10": 0.533,
+   "tempo_stability": 0.973
+  },
+  "notes": "master detected abrupt ending, applied 6s fade"
+ },
+ {
+  "n": 31,
+  "file": "s22__ace-step-1.5__1.wav",
+  "preview": "31.mp3",
+  "track_id": "s22",
+  "model": "ace-step-1.5",
+  "title_en": "A Migu Blossom Behind the Ear",
+  "score": 98,
+  "status": "pass",
+  "duration_s": 185.0,
+  "suggested_fade_out": null,
+  "rhythm": {
+   "file": "s22__ace-step-1.5__1.wav",
+   "global_bpm": 83.4,
+   "pulse_clarity": 0.634,
+   "local_clarity_med": 0.596,
+   "local_clarity_p10": 0.53,
+   "tempo_stability": 1.0
+  },
+  "notes": ""
+ },
+ {
+  "n": 32,
+  "file": "s30__ace-step-1.5__2.wav",
+  "preview": "32.mp3",
+  "track_id": "s30",
+  "model": "ace-step-1.5",
+  "title_en": "Drizzle on the Bamboo Slips",
+  "score": 98,
+  "status": "pass",
+  "duration_s": 190.0,
+  "suggested_fade_out": null,
+  "rhythm": {
+   "file": "s30__ace-step-1.5__2.wav",
+   "global_bpm": 161.5,
+   "pulse_clarity": 0.615,
+   "local_clarity_med": 0.637,
+   "local_clarity_p10": 0.456,
+   "tempo_stability": 0.973
+  },
+  "notes": ""
+ },
+ {
+  "n": 33,
+  "file": "s32__ace-step-1.5__2.wav",
+  "preview": "33.mp3",
+  "track_id": "s32",
+  "model": "ace-step-1.5",
+  "title_en": "Above the Clouds of the Southern Mountains",
+  "score": 98,
+  "status": "pass",
+  "duration_s": 195.0,
+  "suggested_fade_out": null,
+  "rhythm": {
+   "file": "s32__ace-step-1.5__2.wav",
+   "global_bpm": 69.8,
+   "pulse_clarity": 0.442,
+   "local_clarity_med": 0.38,
+   "local_clarity_p10": 0.153,
+   "tempo_stability": 1.0
+  },
+  "notes": ""
+ },
+ {
+  "n": 34,
+  "file": "s31__ace-step-1.5__2.wav",
+  "preview": "34.mp3",
+  "track_id": "s31",
+  "model": "ace-step-1.5",
+  "title_en": "Indigo Jacket, Lamp Turned Low",
+  "score": 98,
+  "status": "pass",
+  "duration_s": 200.0,
+  "suggested_fade_out": null,
+  "rhythm": {
+   "file": "s31__ace-step-1.5__2.wav",
+   "global_bpm": 69.8,
+   "pulse_clarity": 0.571,
+   "local_clarity_med": 0.526,
+   "local_clarity_p10": 0.38,
+   "tempo_stability": 1.0
+  },
+  "notes": ""
+ },
+ {
+  "n": 35,
+  "file": "s26__ace-step-1.5__2.wav",
+  "preview": "35.mp3",
+  "track_id": "s26",
+  "model": "ace-step-1.5",
+  "title_en": "Blossom-Light on Still Water",
+  "score": 98,
+  "status": "pass",
+  "duration_s": 180.0,
+  "suggested_fade_out": null,
+  "rhythm": {
+   "file": "s26__ace-step-1.5__2.wav",
+   "global_bpm": 172.3,
+   "pulse_clarity": 0.633,
+   "local_clarity_med": 0.615,
+   "local_clarity_p10": 0.546,
+   "tempo_stability": 0.914
+  },
+  "notes": ""
+ },
+ {
+  "n": 36,
+  "file": "s21__ace-step-1.5__2.wav",
+  "preview": "36.mp3",
+  "track_id": "s21",
+  "model": "ace-step-1.5",
+  "title_en": "Where Zhaoyao Looks to the Sea",
+  "score": 98,
+  "status": "pass",
+  "duration_s": 180.0,
+  "suggested_fade_out": null,
+  "rhythm": {
+   "file": "s21__ace-step-1.5__2.wav",
+   "global_bpm": 86.1,
+   "pulse_clarity": 0.589,
+   "local_clarity_med": 0.564,
+   "local_clarity_p10": 0.484,
+   "tempo_stability": 1.0
+  },
+  "notes": ""
  }
 ]
